@@ -5,6 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Search Page</title>
     <style>
+
+      h2 {
+        text-align: left;
+        margin-left: 0;
+      }
+
       body {
         font-family: Arial, sans-serif;
         background-color: #f5f7fa;
@@ -60,8 +66,10 @@
         font-size: 14px;
         color: #333;
       }
+
       .recent-query-container {
-        margin-top: 10px;
+        margin: 20px auto;
+        padding: 0 15px;
       }
 
       .pill {
@@ -75,16 +83,14 @@
       }
 
       .recent-accessed-links-container {
-        margin-top: 10px;
+        margin: 20px auto;
+        padding: 0 15px;
       }
 
       .link-item {
         margin: 5px 0;
         color: #007bff;
         cursor: pointer;
-      }
-      .recent-accessed-links-container {
-        margin-top: 10px;
       }
 
       .row {
@@ -136,18 +142,15 @@
         placeholder="Search for content..."
       />
       <div id="recentQueryContainer" class="recent-query-container"></div>
-      <h3>Recently Accessed</h3>
-      <div
-        id="recentAccessedLinksContainer"
-        class="recent-accessed-links-container"
-      ></div>
-      <h2>Google Drive</h2>
+
+      <div id="recentAccessedLinksContainer" class="recent-accessed-links-container"></div>
+
       <div id="googleDriveResults" class="results-container"></div>
-      <h2>Confluence</h2>
+
       <div id="wikiResults" class="results-container"></div>
-      <h2>Jira</h2>
+
       <div id="jiraResults" class="results-container"></div>
-      <h2>Asana</h2>
+
       <div id="asanaResults" class="results-container"></div>
     </div>
 
@@ -272,6 +275,10 @@
         // Clear the container
         recentAccessedLinksContainer.innerHTML = "";
 
+        const header = document.createElement("h2");
+        header.textContent = "Recent Accessed Links";
+        recentAccessedLinksContainer.appendChild(header);
+
         // Create a row container
         const row = document.createElement("div");
         row.className = "row";
@@ -328,6 +335,10 @@
         // Clear the container
         recentQueryContainer.innerHTML = "";
 
+        const header = document.createElement("h2");
+        header.textContent = "Recent Queries";
+        recentQueryContainer.appendChild(header);
+
         // Create pills for each query
         recentQueries.forEach((query) => {
           const pill = document.createElement("div");
@@ -352,20 +363,24 @@
         fetchResults("google-drive", query, displayGoogleDriveResults);
       }
 
-      function fetchWikiResults(query) { 
+      function fetchWikiResults(query) {
         fetchResults("wiki", query, displayWikiResults);
       }
 
-      function fetchJiraResults(query) { 
+      function fetchJiraResults(query) {
         fetchResults("jira", query, displayJiraResults);
       }
 
-      function fetchAsanaResults(query) { 
+      function fetchAsanaResults(query) {
         fetchResults("asana", query, displayAsanaResults);
       }
 
       function displayGoogleDriveResults(results) {
         googleDriveResultsContainer.innerHTML = ""; // Clear previous results and add header
+
+        const header = document.createElement("h2");
+        header.textContent = "Google Drive";
+        googleDriveResultsContainer.appendChild(header);
 
         if (results.length === 0) {
           googleDriveResultsContainer.innerHTML += "<p>No results found</p>";
@@ -393,6 +408,10 @@
 
       function displayWikiResults(results) {
         wikiResultsContainer.innerHTML = ""; // Clear previous results and add header
+
+        const header = document.createElement("h2");
+        header.textContent = "Wiki";
+        wikiResultsContainer.appendChild(header);
 
         if (results.length === 0) {
           wikiResultsContainer.innerHTML += "<p>No results found</p>";
@@ -427,6 +446,10 @@
       function displayJiraResults(issues) {
         jiraResultsContainer.innerHTML = ""; // Clear previous results and add header
 
+        const header = document.createElement("h2");
+        header.textContent = "Jira";
+        jiraResultsContainer.appendChild(header);
+
         if (issues.length === 0) {
           jiraResultsContainer.innerHTML += "<p>No results found</p>";
           return;
@@ -454,6 +477,10 @@
 
       function displayAsanaResults(results) {
         asanaResultsContainer.innerHTML = ""; // Clear previous results and add header
+
+        const header = document.createElement("h2");
+        header.textContent = "Asana";
+        asanaResultsContainer.appendChild(header);
 
         if (results.length === 0) {
           asanaResultsContainer.innerHTML += "<p>No results found</p>";
