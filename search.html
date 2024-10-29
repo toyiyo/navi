@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Search Page</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f5f7fa;
+        margin: 0;
+        padding: 0;
+      }
+
+      .search-container {
+        max-width: 800px;
+        margin: 50px auto;
+        text-align: center;
+      }
+
+      .search-box {
+        width: 100%;
+        max-width: 600px;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        font-size: 18px;
+      }
+
+      .results-container {
+        max-width: 800px;
+        margin: 20px auto;
+        padding: 0 15px;
+      }
+
+      .result-item {
+        background-color: #fff;
+        padding: 15px;
+        margin: 10px 0;
+        border-radius: 5px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+
+      .result-item a {
+        text-decoration: none;
+        color: #0070e0;
+        font-weight: bold;
+      }
+
+      .result-item p {
+        margin: 10px 0;
+        font-size: 14px;
+        color: #333;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="search-container">
+      <input
+        id="searchBox"
+        class="search-box"
+        type="text"
+        placeholder="Search for content..."
+      />
+      <h2>Google Drive</h2>
+      <div id="googleDriveResults" class="results-container"></div>
+      <h2>Wiki Results</h2>
+      <div id="wikiResults" class="results-container"></div>
+      <h2>Tickets Jira</h2>
+      <div id="jiraResults" class="results-container"></div>
+      <h2>Asana Results</h2>
+      <div id="asanaResults" class="results-container"></div>
+    </div>
+
+    <script>
+      const searchBox = document.getElementById("searchBox");
+      const wikiResultsContainer = document.getElementById("wikiResults");
+      const jiraResultsContainer = document.getElementById("jiraResults");
+      const asanaResultsContainer = document.getElementById("asanaResults");
+      const googleDriveResultsContainer = document.getElementById("googleDriveResults");
+
+      searchBox.addEventListener("keyup", function (event) {
+        if (event.key === "Enter") {
+          const query = searchBox.value;
+          fetchWikiResults(query);
+          fetchJiraResults(query);
+          fetchAsanaResults(query);
+          fetchGoogleDriveResults(query); // Fetch Google Drive results
+        }
+      });
+
+      function fetchGoogleDriveResults(query) {
+        const apiUrl = `https://2fff-2600-1700-1101-6de0-2105-cf27-50a6-4499.ngrok-free.app/webhook/google-drive?search=${encodeURIComponent(
+          query
+        )}`;
+
+        fetch(apiUrl, {
+          headers: {
+            "ngrok-skip-browser-warning": "69420",
+          },
+        })
+          .then((response) => response.json())
+          .then((data) => displayGoogleDriveResults(data.slice(0, 5))) // Display only the first 5 results
+          .catch((error) => {
+            console.error("Error fetching Google Drive results:", error);
+            googleDriveResultsContainer.innerHTML = "<p>No results found</p>";
+          });
+      }
+
+      function fetchWikiResults(query) {
+        const apiUrl = `https://2fff-2600-1700-1101-6de0-2105-cf27-50a6-4499.ngrok-free.app/webhook/wiki?search=${encodeURIComponent(
+          query
+        )}`;
+
+        fetch(apiUrl, {
+          headers: {
+            "ngrok-skip-browser-warning": "69420",
+          },
+        })
+          .then((response) => response.json())
+          .then((data) => displayWikiResults(data))
+          .catch((error) => {
+            console.error("Error fetching wiki results:", error);
+            wikiResultsContainer.innerHTML = "<p>No results found</p>";
+          });
+      }
+
+      function fetchJiraResults(query) {
+        const apiUrl = `https://2fff-2600-1700-1101-6de0-2105-cf27-50a6-4499.ngrok-free.app/webhook/jira?search=${encodeURIComponent(
+          query
+        )}`;
+
+        fetch(apiUrl, {
+          headers: {
+            "ngrok-skip-browser-warning": "69420",
+          },
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            displayJiraResults(data);
+          })
+          .catch((error) => {
+            console.error("Error fetching jira results:", error);
+            jiraResultsContainer.innerHTML = "<p>No results found</p>";
+          });
+      }
+
+      function fetchAsanaResults(query) {
+        const apiUrl = `https://2fff-2600-1700-1101-6de0-2105-cf27-50a6-4499.ngrok-free.app/webhook/asana?search=${encodeURIComponent(
+          query
+        )}`;
+
+        fetch(apiUrl, {
+          headers: {
+            "ngrok-skip-browser-warning": "69420",
+          },
+        })
+          .then((response) => response.json())
+          .then((data) => displayAsanaResults(data.slice(0, 5))) // Display only the first 5 results
+          .catch((error) => {
+            console.error("Error fetching asana results:", error);
+            asanaResultsContainer.innerHTML = "<p>No results found</p>";
+          });
+      }
+
+      function displayGoogleDriveResults(results) {
+        googleDriveResultsContainer.innerHTML = ""; // Clear previous results and add header
+
+        if (results.length === 0) {
+          googleDriveResultsContainer.innerHTML += "<p>No results found</p>";
+          return;
+        }
+
+        results.forEach((result) => {
+          const resultItem = document.createElement("div");
+          resultItem.className = "result-item";
+
+          const resultLink = document.createElement("a");
+          resultLink.href = result.webViewLink; // Use the webViewLink for the link
+          resultLink.target = "_blank";
+          resultLink.innerText = result.name; // Use the name for the link text
+
+          resultItem.appendChild(resultLink);
+          googleDriveResultsContainer.appendChild(resultItem);
+        });
+      }
+
+      function displayWikiResults(results) {
+        wikiResultsContainer.innerHTML = ""; // Clear previous results and add header
+
+        if (results.length === 0) {
+          wikiResultsContainer.innerHTML += "<p>No results found</p>";
+          return;
+        }
+
+        results.forEach((result) => {
+          const resultItem = document.createElement("div");
+          resultItem.className = "result-item";
+
+          const resultLink = document.createElement("a");
+          resultLink.href =
+            result["body._links"].base + result["body._links"].webui;
+          resultLink.target = "_blank";
+          resultLink.innerText = result["body.title"]; // Use the title for the link text
+
+          const resultDescription = document.createElement("p");
+          resultDescription.innerHTML =
+            result["body.body.view.value"].slice(0, 200) + "..."; // Limit text to first 200 characters
+
+          resultItem.appendChild(resultLink);
+          resultItem.appendChild(resultDescription);
+          wikiResultsContainer.appendChild(resultItem);
+        });
+      }
+
+      function displayJiraResults(issues) {
+        jiraResultsContainer.innerHTML = ""; // Clear previous results and add header
+
+        if (issues.length === 0) {
+          jiraResultsContainer.innerHTML += "<p>No results found</p>";
+          return;
+        }
+
+        issues.forEach((issue) => {
+          const issueItem = document.createElement("div");
+          issueItem.className = "result-item";
+
+          const issueLink = document.createElement("a");
+          issueLink.href = `https://jira.caremessage.org/browse/${issue.key}`;
+          issueLink.target = "_blank";
+          issueLink.innerText = issue.fields.summary; // Use the summary for the link text
+
+          const issueDescription = document.createElement("p");
+          issueDescription.innerHTML = issue.fields.description
+            ? issue.fields.description.slice(0, 200) + "..."
+            : "No description available"; // Limit text to first 200 characters
+
+          issueItem.appendChild(issueLink);
+          issueItem.appendChild(issueDescription);
+          jiraResultsContainer.appendChild(issueItem);
+        });
+      }
+
+      function displayAsanaResults(results) {
+        asanaResultsContainer.innerHTML = ""; // Clear previous results and add header
+
+        if (results.length === 0) {
+          asanaResultsContainer.innerHTML += "<p>No results found</p>";
+          return;
+        }
+
+        results.forEach((result) => {
+          const resultItem = document.createElement("div");
+          resultItem.className = "result-item";
+
+          const resultLink = document.createElement("a");
+          resultLink.href = `https://app.asana.com/0/search?q=${encodeURIComponent(
+            result.name
+          )}&searched_type=task&child=${result.gid}&f=true`;
+          resultLink.target = "_blank";
+          resultLink.innerText = result.name; // Use the name for the link text
+
+          resultItem.appendChild(resultLink);
+          asanaResultsContainer.appendChild(resultItem);
+        });
+      }
+    </script>
+  </body>
+</html>
