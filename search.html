@@ -65,6 +65,58 @@
         border-radius: 15px;
         cursor: pointer;
       }
+
+      .recent-accessed-links-container {
+        margin-top: 10px;
+      }
+
+      .link-item {
+        margin: 5px 0;
+        color: #007bff;
+        cursor: pointer;
+      }
+      .recent-accessed-links-container {
+        margin-top: 10px;
+      }
+
+      .row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+      }
+
+      .col {
+        flex: 1 1 calc(25% - 1rem); /* Adjust the percentage to control the number of columns */
+        box-sizing: border-box;
+      }
+
+      .card {
+        border: 1px solid #ddd;
+        border-radius: 0.25rem;
+        padding: 1rem;
+        background-color: #f8f9fa;
+      }
+
+      .card-body {
+        display: flex;
+        flex-direction: column;
+        align-items: start;
+      }
+
+      .card-title {
+        font-weight: bold;
+        margin-bottom: 0.5rem;
+        text-decoration: none;
+        color: #007bff;
+      }
+
+      .card-title:hover {
+        text-decoration: underline;
+      }
+
+      .card-text {
+        margin: 0;
+      }
     </style>
   </head>
   <body>
@@ -76,6 +128,10 @@
         placeholder="Search for content..."
       />
       <div id="recentQueryContainer" class="recent-query-container"></div>
+      <div
+        id="recentAccessedLinksContainer"
+        class="recent-accessed-links-container"
+      ></div>
       <h2>Google Drive</h2>
       <div id="googleDriveResults" class="results-container"></div>
       <h2>Wiki Results</h2>
@@ -96,7 +152,11 @@
       const recentQueryContainer = document.getElementById(
         "recentQueryContainer"
       );
+      const recentAccessedLinksContainer = document.getElementById(
+        "recentAccessedLinksContainer"
+      );
       let recentQuery = [];
+      let recentAccessedLinks = [];
 
       searchBox.addEventListener("keyup", function (event) {
         if (event.key === "Enter") {
@@ -105,11 +165,69 @@
           fetchJiraResults(query);
           fetchAsanaResults(query);
           fetchGoogleDriveResults(query); // Fetch Google Drive results
-          addRecentLink(query);
+          addRecentQuery(query);
         }
       });
 
-      function addRecentLink(query) {
+      document.addEventListener("click", function (event) {
+        if (
+          event.target.tagName === "A" &&
+          event.target.parentElement.classList.contains("result-item")
+        ) {
+          addRecentAccessedLink(event.target);
+        }
+      });
+
+      function addRecentAccessedLink(link) {
+        // Add the link to the beginning of the array
+        if (!recentAccessedLinks.includes(link)) {
+          recentAccessedLinks.unshift(link);
+
+          // Keep only the first 5 links
+          if (recentAccessedLinks.length > 4) {
+            recentAccessedLinks.pop();
+          }
+
+          // Update the display
+          displayRecentAccessedLinks(recentAccessedLinks);
+        }
+      }
+
+      function displayRecentAccessedLinks(recentLinks) {
+        // Clear the container
+        recentAccessedLinksContainer.innerHTML = "";
+
+        // Create a row container
+        const row = document.createElement("div");
+        row.className = "row";
+
+        // Create columns for each link
+        recentLinks.forEach((link) => {
+          const col = document.createElement("div");
+          col.className = "col";
+
+          const card = document.createElement("div");
+          card.className = "card";
+
+          const cardBody = document.createElement("div");
+          cardBody.className = "card-body";
+
+          const cardTitle = document.createElement("a");
+          cardTitle.className = "card-title";
+          cardTitle.textContent = link.innerHTML;
+          cardTitle.href = link;
+          cardTitle.target = "_blank"; // Open in a new tab
+
+          cardBody.appendChild(cardTitle);
+          card.appendChild(cardBody);
+          col.appendChild(card);
+          row.appendChild(col);
+        });
+
+        recentAccessedLinksContainer.appendChild(row);
+      }
+
+      function addRecentQuery(query) {
         // Add the query to the beginning of the array
         if (!recentQuery.includes(query)) {
           recentQuery.unshift(query);
@@ -149,7 +267,9 @@
       }
 
       function fetchGoogleDriveResults(query) {
-        const apiUrl = `https://2fff-2600-1700-1101-6de0-2105-cf27-50a6-4499.ngrok-free.app/webhook/google-drive?search=${encodeURIComponent(query)}`;
+        const apiUrl = `https://2fff-2600-1700-1101-6de0-2105-cf27-50a6-4499.ngrok-free.app/webhook/google-drive?search=${encodeURIComponent(
+          query
+        )}`;
 
         fetch(apiUrl, {
           headers: {
@@ -165,7 +285,9 @@
       }
 
       function fetchWikiResults(query) {
-        const apiUrl = `https://2fff-2600-1700-1101-6de0-2105-cf27-50a6-4499.ngrok-free.app/webhook/wiki?search=${encodeURIComponent(query)}`;
+        const apiUrl = `https://2fff-2600-1700-1101-6de0-2105-cf27-50a6-4499.ngrok-free.app/webhook/wiki?search=${encodeURIComponent(
+          query
+        )}`;
 
         fetch(apiUrl, {
           headers: {
@@ -181,7 +303,9 @@
       }
 
       function fetchJiraResults(query) {
-        const apiUrl = `https://2fff-2600-1700-1101-6de0-2105-cf27-50a6-4499.ngrok-free.app/webhook/jira?search=${encodeURIComponent(query)}`;
+        const apiUrl = `https://2fff-2600-1700-1101-6de0-2105-cf27-50a6-4499.ngrok-free.app/webhook/jira?search=${encodeURIComponent(
+          query
+        )}`;
 
         fetch(apiUrl, {
           headers: {
