@@ -90,7 +90,7 @@
       });
 
       function fetchGoogleDriveResults(query) {
-        const apiUrl = `https://2fff-2600-1700-1101-6de0-2105-cf27-50a6-4499.ngrok-free.app/webhook/google-drive?search=${encodeURIComponent(
+        const apiUrl = `localhost:8080?search=${encodeURIComponent(
           query
         )}`;
 
@@ -108,7 +108,7 @@
       }
 
       function fetchWikiResults(query) {
-        const apiUrl = `https://2fff-2600-1700-1101-6de0-2105-cf27-50a6-4499.ngrok-free.app/webhook/wiki?search=${encodeURIComponent(
+        const apiUrl = `localhost:8080?search=${encodeURIComponent(
           query
         )}`;
 
@@ -126,7 +126,7 @@
       }
 
       function fetchJiraResults(query) {
-        const apiUrl = `https://2fff-2600-1700-1101-6de0-2105-cf27-50a6-4499.ngrok-free.app/webhook/jira?search=${encodeURIComponent(
+        const apiUrl = `localhost:8080?search=${encodeURIComponent(
           query
         )}`;
 
@@ -146,7 +146,7 @@
       }
 
       function fetchAsanaResults(query) {
-        const apiUrl = `https://2fff-2600-1700-1101-6de0-2105-cf27-50a6-4499.ngrok-free.app/webhook/asana?search=${encodeURIComponent(
+        const apiUrl = `localhost:8080/webhook/asana?search=${encodeURIComponent(
           query
         )}`;
 
