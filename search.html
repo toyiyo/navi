@@ -52,6 +52,19 @@
         font-size: 14px;
         color: #333;
       }
+      .recent-query-container {
+        margin-top: 10px;
+      }
+
+      .pill {
+        display: inline-block;
+        padding: 5px 10px;
+        margin: 5px;
+        background-color: #007bff;
+        color: white;
+        border-radius: 15px;
+        cursor: pointer;
+      }
     </style>
   </head>
   <body>
@@ -62,6 +75,7 @@
         type="text"
         placeholder="Search for content..."
       />
+      <div id="recentQueryContainer" class="recent-query-container"></div>
       <h2>Google Drive</h2>
       <div id="googleDriveResults" class="results-container"></div>
       <h2>Wiki Results</h2>
@@ -77,7 +91,12 @@
       const wikiResultsContainer = document.getElementById("wikiResults");
       const jiraResultsContainer = document.getElementById("jiraResults");
       const asanaResultsContainer = document.getElementById("asanaResults");
-      const googleDriveResultsContainer = document.getElementById("googleDriveResults");
+      const googleDriveResultsContainer =
+        document.getElementById("googleDriveResults");
+      const recentQueryContainer = document.getElementById(
+        "recentQueryContainer"
+      );
+      let recentQuery = [];
 
       searchBox.addEventListener("keyup", function (event) {
         if (event.key === "Enter") {
@@ -86,13 +105,51 @@
           fetchJiraResults(query);
           fetchAsanaResults(query);
           fetchGoogleDriveResults(query); // Fetch Google Drive results
+          addRecentLink(query);
         }
       });
 
+      function addRecentLink(query) {
+        // Add the query to the beginning of the array
+        if (!recentQuery.includes(query)) {
+          recentQuery.unshift(query);
+
+          // Keep only the first 5 query
+          if (recentQuery.length > 5) {
+            recentQuery.pop();
+          }
+
+          // Update the display
+          displayrecentQuery(recentQuery);
+        }
+      }
+
+      function displayrecentQuery(recentQueries) {
+        // Clear the container
+        recentQueryContainer.innerHTML = "";
+
+        // Create pills for each query
+        recentQueries.forEach((query) => {
+          const pill = document.createElement("div");
+          pill.className = "pill";
+          pill.textContent = query;
+          pill.onclick = () => {
+            // Handle pill click by triggering the keyup event for Enter key
+            searchBox.value = query;
+            const event = new KeyboardEvent("keyup", {
+              key: "Enter",
+              keyCode: 13,
+              which: 13,
+              bubbles: true,
+            });
+            searchBox.dispatchEvent(event);
+          };
+          recentQueryContainer.appendChild(pill);
+        });
+      }
+
       function fetchGoogleDriveResults(query) {
-        const apiUrl = `localhost:8080?search=${encodeURIComponent(
-          query
-        )}`;
+        const apiUrl = `https://2fff-2600-1700-1101-6de0-2105-cf27-50a6-4499.ngrok-free.app/webhook/google-drive?search=${encodeURIComponent(query)}`;
 
         fetch(apiUrl, {
           headers: {
@@ -108,9 +165,7 @@
       }
 
       function fetchWikiResults(query) {
-        const apiUrl = `localhost:8080?search=${encodeURIComponent(
-          query
-        )}`;
+        const apiUrl = `https://2fff-2600-1700-1101-6de0-2105-cf27-50a6-4499.ngrok-free.app/webhook/wiki?search=${encodeURIComponent(query)}`;
 
         fetch(apiUrl, {
           headers: {
@@ -126,9 +181,7 @@
       }
 
       function fetchJiraResults(query) {
-        const apiUrl = `localhost:8080?search=${encodeURIComponent(
-          query
-        )}`;
+        const apiUrl = `https://2fff-2600-1700-1101-6de0-2105-cf27-50a6-4499.ngrok-free.app/webhook/jira?search=${encodeURIComponent(query)}`;
 
         fetch(apiUrl, {
           headers: {
@@ -146,7 +199,7 @@
       }
 
       function fetchAsanaResults(query) {
-        const apiUrl = `localhost:8080/webhook/asana?search=${encodeURIComponent(
+        const apiUrl = `https://2fff-2600-1700-1101-6de0-2105-cf27-50a6-4499.ngrok-free.app/webhook/asana?search=${encodeURIComponent(
           query
         )}`;
 
