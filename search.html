@@ -207,6 +207,12 @@
                             </defs>
                             </svg>`;
 
+      const API_BASE_URL =
+        "https://2fff-2600-1700-1101-6de0-2105-cf27-50a6-4499.ngrok-free.app/webhook";
+      const HEADERS = {
+        "ngrok-skip-browser-warning": "69420",
+      };
+
       let recentQuery = [];
       let recentAccessedLinks = [];
 
@@ -229,6 +235,23 @@
           addRecentAccessedLink(event.target);
         }
       });
+
+      async function fetchResults(endpoint, query, displayFunction) {
+        const apiUrl = `${API_BASE_URL}/${endpoint}?search=${encodeURIComponent(query)}`;
+
+        try {
+          const response = await fetch(apiUrl, { headers: HEADERS });
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          const data = await response.json();
+          displayFunction(data.slice(0, 5)); // Display only the first 5 results
+        } catch (error) {
+          console.error(`Error fetching ${endpoint} results:`, error);
+          const container = document.getElementById(`${endpoint}Results`);
+          container.innerHTML = "<p>No results found</p>";
+        }
+      }
 
       function addRecentAccessedLink(link) {
         // Add the link to the beginning of the array
@@ -326,77 +349,19 @@
       }
 
       function fetchGoogleDriveResults(query) {
-        const apiUrl = `https://2fff-2600-1700-1101-6de0-2105-cf27-50a6-4499.ngrok-free.app/webhook/google-drive?search=${encodeURIComponent(
-          query
-        )}`;
-
-        fetch(apiUrl, {
-          headers: {
-            "ngrok-skip-browser-warning": "69420",
-          },
-        })
-          .then((response) => response.json())
-          .then((data) => displayGoogleDriveResults(data.slice(0, 5))) // Display only the first 5 results
-          .catch((error) => {
-            console.error("Error fetching Google Drive results:", error);
-            googleDriveResultsContainer.innerHTML = "<p>No results found</p>";
-          });
+        fetchResults("google-drive", query, displayGoogleDriveResults);
       }
 
-      function fetchWikiResults(query) {
-        const apiUrl = `https://2fff-2600-1700-1101-6de0-2105-cf27-50a6-4499.ngrok-free.app/webhook/wiki?search=${encodeURIComponent(
-          query
-        )}`;
-
-        fetch(apiUrl, {
-          headers: {
-            "ngrok-skip-browser-warning": "69420",
-          },
-        })
-          .then((response) => response.json())
-          .then((data) => displayWikiResults(data.slice(0, 5))) // Display only the first 5 results
-          .catch((error) => {
-            console.error("Error fetching wiki results:", error);
-            wikiResultsContainer.innerHTML = "<p>No results found</p>";
-          });
+      function fetchWikiResults(query) { 
+        fetchResults("wiki", query, displayWikiResults);
       }
 
-      function fetchJiraResults(query) {
-        const apiUrl = `https://2fff-2600-1700-1101-6de0-2105-cf27-50a6-4499.ngrok-free.app/webhook/jira?search=${encodeURIComponent(
-          query
-        )}`;
-
-        fetch(apiUrl, {
-          headers: {
-            "ngrok-skip-browser-warning": "69420",
-          },
-        })
-          .then((response) => response.json())
-          .then((data) => {
-            displayJiraResults(data.slice(0, 5)); // Display only the first 5 results
-          })
-          .catch((error) => {
-            console.error("Error fetching jira results:", error);
-            jiraResultsContainer.innerHTML = "<p>No results found</p>";
-          });
+      function fetchJiraResults(query) { 
+        fetchResults("jira", query, displayJiraResults);
       }
 
-      function fetchAsanaResults(query) {
-        const apiUrl = `https://2fff-2600-1700-1101-6de0-2105-cf27-50a6-4499.ngrok-free.app/webhook/asana?search=${encodeURIComponent(
-          query
-        )}`;
-
-        fetch(apiUrl, {
-          headers: {
-            "ngrok-skip-browser-warning": "69420",
-          },
-        })
-          .then((response) => response.json())
-          .then((data) => displayAsanaResults(data.slice(0, 5))) // Display only the first 5 results
-          .catch((error) => {
-            console.error("Error fetching asana results:", error);
-            asanaResultsContainer.innerHTML = "<p>No results found</p>";
-          });
+      function fetchAsanaResults(query) { 
+        fetchResults("asana", query, displayAsanaResults);
       }
 
       function displayGoogleDriveResults(results) {
