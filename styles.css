@@ -1,0 +1,239 @@
+h2 {
+    text-align: left;
+    margin-left: 0;
+  }
+
+  body {
+    font-family: Arial, sans-serif;
+    background-color: #f5f7fa;
+    margin: 0;
+    padding: 0;
+  }
+
+  .search-container {
+    max-width: 800px;
+    margin: 50px auto;
+    text-align: center;
+  }
+
+  .search-box {
+    width: 100%;
+    max-width: 600px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 18px;
+  }
+
+  .results-container {
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 0 15px;
+  }
+
+  .result-item {
+    display: flex;
+    align-items: center;
+    background-color: #fff;
+    padding: 15px;
+    margin: 10px 0;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+
+  .result-icon {
+    width: 24px;
+    height: 24px;
+    margin-right: 10px;
+  }
+
+  .result-item a {
+    text-decoration: none;
+    color: #0070e0;
+    font-weight: bold;
+  }
+
+  .result-item p {
+    margin: 10px 0;
+    font-size: 14px;
+    color: #333;
+  }
+
+  .recent-query-container {
+    margin: 20px auto;
+    padding: 0 15px;
+  }
+
+  .pill {
+    display: inline-block;
+    padding: 5px 10px;
+    margin: 5px;
+    background-color: #007bff;
+    color: white;
+    border-radius: 15px;
+    cursor: pointer;
+  }
+
+  .recent-accessed-links-container {
+    margin: 20px auto;
+    padding: 0 15px;
+  }
+
+  .link-item {
+    margin: 5px 0;
+    color: #007bff;
+    cursor: pointer;
+  }
+
+  .row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  .col {
+    flex: 1 1 calc(25% - 1rem); /* Adjust the percentage to control the number of columns */
+    box-sizing: border-box;
+  }
+
+  .card {
+    border: 1px solid #ddd;
+    border-radius: 0.25rem;
+    padding: 1rem;
+    background-color: #f8f9fa;
+  }
+
+  .card-body {
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+  }
+
+  .card-title {
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+    text-decoration: none;
+    color: #007bff;
+  }
+
+  .card-title:hover {
+    text-decoration: underline;
+  }
+
+  .card-text {
+    margin: 0;
+  }
+
+  /* Chat Panel Styles */
+  .chat-panel {
+    position: fixed;
+    right: -400px;
+    top: 0;
+    width: 400px;
+    height: 100%;
+    background-color: #f8f9fa;
+    box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
+    transition: right 0.3s ease;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .chat-panel.open {
+    right: 0;
+  }
+
+  .chat-panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    background-color: #007bff;
+    color: white;
+  }
+
+  .close-chat-panel {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: white;
+  }
+
+  .chat-response-container {
+    flex: 1;
+    padding: 10px;
+    overflow-y: auto;
+  }
+
+  .chat-input-container {
+    display: flex;
+    padding: 10px;
+    background-color: #e9ecef;
+  }
+
+  .chat-input {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    margin-right: 10px;
+  }
+
+  .send-chat-button {
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+
+  .send-chat-button:hover {
+    background-color: #0056b3;
+  }
+
+  .open-chat-panel {
+    position: fixed;
+    right: 20px;
+    bottom: 20px;
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+
+  .open-chat-panel:hover {
+    background-color: #0056b3;
+  }
+
+  .chat-response {
+    margin-bottom: 10px;
+    padding: 10px;
+    background-color: #e9ecef;
+    border-radius: 5px;
+  }
+
+  .loading-spinner {
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #007bff;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    animation: spin 1s linear infinite;
+    margin: 10px auto;
+  }
+
+  @keyframes spin {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+
+  .hidden {
+    display: none;
+  }
