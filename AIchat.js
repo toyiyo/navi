@@ -15,22 +15,20 @@ closeChatPanelButton.addEventListener("click", () => {
   openChatPanelButton.classList.remove("hidden");
 });
 
-sendChatButton.addEventListener("click", async () => {
-  const userInput = chatInput.value;
-  if (!userInput) {
-    alert("Please enter a message.");
-    return;
-  }
+const handleSendChat = async () => {
+    const userInput = DOMPurify.sanitize(chatInput.value);
+    if (!userInput) {
+      alert("Please enter a message.");
+      return;
+    }
 
-  // Display loading spinner
-  const loadingSpinner = document.createElement("div");
-  loadingSpinner.className = "loading-spinner";
-  chatResponseContainer.appendChild(loadingSpinner);
+    // Display loading spinner
+    const loadingSpinner = document.createElement("div");
+    loadingSpinner.className = "loading-spinner";
+    chatResponseContainer.appendChild(loadingSpinner);
 
-  try {
-    const response = await fetch(
-      "https://2fff-2600-1700-1101-6de0-2105-cf27-50a6-4499.ngrok-free.app/webhook/d3666369-8f13-4076-81e8-11f32d91d6fa/chat",
-      {
+    try {
+      const response = await fetch("https://2fff-2600-1700-1101-6de0-2105-cf27-50a6-4499.ngrok-free.app/webhook/d3666369-8f13-4076-81e8-11f32d91d6fa/chat", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -40,24 +38,30 @@ sendChatButton.addEventListener("click", async () => {
           action: "sendMessage",
           chatInput: userInput,
         }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
-    );
 
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      const data = await response.json();
+      displayChatResponse(data);
+    } catch (error) {
+      console.error("Error fetching chat response:", error);
+      chatResponseContainer.innerHTML = "<p>Error fetching chat response. Please try again later.</p>";
+    } finally {
+      // Remove loading spinner
+      chatResponseContainer.removeChild(loadingSpinner);
     }
+  };
 
-    const data = await response.json();
-    displayChatResponse(data);
-  } catch (error) {
-    console.error("Error fetching chat response:", error);
-    chatResponseContainer.innerHTML =
-      "<p>Error fetching chat response. Please try again later.</p>";
-  } finally {
-    // Remove loading spinner
-    chatResponseContainer.removeChild(loadingSpinner);
-  }
-});
+  sendChatButton.addEventListener("click", handleSendChat);
+
+  chatInput.addEventListener("keyup", (event) => {
+    if (event.key === "Enter") {
+      handleSendChat();
+    }
+  });
 
 function displayChatResponse(data) {
   const responseElement = document.createElement("div");
