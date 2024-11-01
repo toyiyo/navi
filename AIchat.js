@@ -23,9 +23,10 @@ const handleSendChat = async () => {
     }
 
     // Display loading spinner
+    sendChatButton.disabled = true;
     const loadingSpinner = document.createElement("div");
     loadingSpinner.className = "loading-spinner";
-    chatResponseContainer.appendChild(loadingSpinner);
+    sendChatButton.appendChild(loadingSpinner);
 
     try {
       const response = await fetch("https://2fff-2600-1700-1101-6de0-2105-cf27-50a6-4499.ngrok-free.app/webhook/d3666369-8f13-4076-81e8-11f32d91d6fa/chat", {
@@ -51,7 +52,8 @@ const handleSendChat = async () => {
       chatResponseContainer.innerHTML = "<p>Error fetching chat response. Please try again later.</p>";
     } finally {
       // Remove loading spinner
-      chatResponseContainer.removeChild(loadingSpinner);
+      sendChatButton.removeChild(loadingSpinner);
+      sendChatButton.disabled = false;
     }
   };
 

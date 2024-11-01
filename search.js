@@ -1,12 +1,14 @@
+const loadingSpinner = document.createElement("div");
+loadingSpinner.className = "loading-spinner";
 const searchBox = document.getElementById("searchBox");
 const wikiResultsContainer = document.getElementById("wikiResults");
 const jiraResultsContainer = document.getElementById("jiraResults");
 const asanaResultsContainer = document.getElementById("asanaResults");
 const googleDriveResultsContainer =
-  document.getElementById("googleDriveResults");
+    document.getElementById("googleDriveResults");
 const recentQueryContainer = document.getElementById("recentQueryContainer");
 const recentAccessedLinksContainer = document.getElementById(
-  "recentAccessedLinksContainer"
+    "recentAccessedLinksContainer"
 );
 const googleDriveLogo = `<svg viewBox="0 0 87.3 78" xmlns="http://www.w3.org/2000/svg">
                           <path d="m6.6 66.85 3.85 6.65c.8 1.4 1.95 2.5 3.3 3.3l13.75-23.8h-27.5c0 1.55.4 3.1 1.2 4.5z" fill="#0066da"/>
@@ -52,300 +54,301 @@ const jiraLogo = `<svg viewBox="0 0 76 32" fill="none" xmlns="http://www.w3.org/
                       </svg>`;
 
 const API_BASE_URL =
-  "https://2fff-2600-1700-1101-6de0-2105-cf27-50a6-4499.ngrok-free.app/webhook";
+    "https://2fff-2600-1700-1101-6de0-2105-cf27-50a6-4499.ngrok-free.app/webhook";
 const HEADERS = {
-  "ngrok-skip-browser-warning": "69420",
+    "ngrok-skip-browser-warning": "69420",
 };
 
 let recentQuery = [];
 let recentAccessedLinks = [];
 
 searchBox.addEventListener("keyup", function (event) {
-  if (event.key === "Enter") {
-    const query = searchBox.value;
-    fetchWikiResults(query);
-    fetchJiraResults(query);
-    fetchAsanaResults(query);
-    fetchGoogleDriveResults(query); // Fetch Google Drive results
-    addRecentQuery(query);
-  }
+    if (event.key === "Enter") {
+        const query = searchBox.value;
+        fetchWikiResults(query);
+        fetchJiraResults(query);
+        fetchAsanaResults(query);
+        fetchGoogleDriveResults(query); // Fetch Google Drive results
+        addRecentQuery(query);
+    }
 });
 
 document.addEventListener("click", function (event) {
-  if (
-    event.target.tagName === "A" &&
-    event.target.parentElement.classList.contains("result-item")
-  ) {
-    addRecentAccessedLink(event.target);
-  }
+    if (
+        event.target.tagName === "A" &&
+        event.target.parentElement.classList.contains("result-item")
+    ) {
+        addRecentAccessedLink(event.target);
+    }
 });
 
 async function fetchResults(endpoint, query, displayFunction) {
-  const apiUrl = `${API_BASE_URL}/${endpoint}?search=${encodeURIComponent(
-    query
-  )}`;
-
-  try {
-    const response = await fetch(apiUrl, { headers: HEADERS });
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    const data = await response.json();
-    displayFunction(data.slice(0, 5)); // Display only the first 5 results
-  } catch (error) {
-    console.error(`Error fetching ${endpoint} results:`, error);
+    const apiUrl = `${API_BASE_URL}/${endpoint}?search=${encodeURIComponent(
+        query
+    )}`;
     const container = document.getElementById(`${endpoint}Results`);
-    container.innerHTML = "<p>No results found</p>";
-  }
+    try {
+        container.appendChild(loadingSpinner);
+        const response = await fetch(apiUrl, { headers: HEADERS });
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        displayFunction(data.slice(0, 5)); // Display only the first 5 results
+    } catch (error) {
+        console.error(`Error fetching ${endpoint} results:`, error);
+
+        container.innerHTML = "<p>No results found</p>";
+    }
 }
 
 function addRecentAccessedLink(link) {
-  // Add the link to the beginning of the array
-  if (!recentAccessedLinks.includes(link)) {
-    recentAccessedLinks.unshift(link);
+    // Add the link to the beginning of the array
+    if (!recentAccessedLinks.includes(link)) {
+        recentAccessedLinks.unshift(link);
 
-    // Keep only the first 5 links
-    if (recentAccessedLinks.length > 4) {
-      recentAccessedLinks.pop();
+        // Keep only the first 5 links
+        if (recentAccessedLinks.length > 4) {
+            recentAccessedLinks.pop();
+        }
+
+        // Update the display
+        displayRecentAccessedLinks(recentAccessedLinks);
     }
-
-    // Update the display
-    displayRecentAccessedLinks(recentAccessedLinks);
-  }
 }
 
 function displayRecentAccessedLinks(recentLinks) {
-  // Clear the container
-  recentAccessedLinksContainer.innerHTML = "";
+    // Clear the container
+    recentAccessedLinksContainer.innerHTML = "";
 
-  const header = document.createElement("h2");
-  header.textContent = "Recent Accessed Links";
-  recentAccessedLinksContainer.appendChild(header);
+    const header = document.createElement("h2");
+    header.textContent = "Recent Accessed Links";
+    recentAccessedLinksContainer.appendChild(header);
 
-  // Create a row container
-  const row = document.createElement("div");
-  row.className = "row";
+    // Create a row container
+    const row = document.createElement("div");
+    row.className = "row";
 
-  // Create columns for each link
-  recentLinks.forEach((link) => {
-    const col = document.createElement("div");
-    col.className = "col";
+    // Create columns for each link
+    recentLinks.forEach((link) => {
+        const col = document.createElement("div");
+        col.className = "col";
 
-    const card = document.createElement("div");
-    card.className = "card";
+        const card = document.createElement("div");
+        card.className = "card";
 
-    const cardBody = document.createElement("div");
-    cardBody.className = "card-body";
+        const cardBody = document.createElement("div");
+        cardBody.className = "card-body";
 
-    const cardTitle = document.createElement("a");
-    cardTitle.className = "card-title";
-    cardTitle.textContent = link.innerHTML;
-    cardTitle.href = link;
-    cardTitle.target = "_blank"; // Open in a new tab
+        const cardTitle = document.createElement("a");
+        cardTitle.className = "card-title";
+        cardTitle.textContent = link.innerHTML;
+        cardTitle.href = link;
+        cardTitle.target = "_blank"; // Open in a new tab
 
-    // Get the icon from the previous sibling of the link
-    const originalIcon = link.previousSibling;
-    const iconContainer = originalIcon.cloneNode(true); // Clone the icon to avoid removing it from the original HTML
+        // Get the icon from the previous sibling of the link
+        const originalIcon = link.previousSibling;
+        const iconContainer = originalIcon.cloneNode(true); // Clone the icon to avoid removing it from the original HTML
 
-    iconContainer.className = "result-icon"; // Ensure the cloned icon has the correct class
+        iconContainer.className = "result-icon"; // Ensure the cloned icon has the correct class
 
-    cardBody.appendChild(iconContainer); // Add the icon to the card body
-    cardBody.appendChild(cardTitle);
-    card.appendChild(cardBody);
-    col.appendChild(card);
-    row.appendChild(col);
-  });
+        cardBody.appendChild(iconContainer); // Add the icon to the card body
+        cardBody.appendChild(cardTitle);
+        card.appendChild(cardBody);
+        col.appendChild(card);
+        row.appendChild(col);
+    });
 
-  recentAccessedLinksContainer.appendChild(row);
+    recentAccessedLinksContainer.appendChild(row);
 }
 
 function addRecentQuery(query) {
-  // Add the query to the beginning of the array
-  if (!recentQuery.includes(query)) {
-    recentQuery.unshift(query);
+    // Add the query to the beginning of the array
+    if (!recentQuery.includes(query)) {
+        recentQuery.unshift(query);
 
-    // Keep only the first 5 query
-    if (recentQuery.length > 5) {
-      recentQuery.pop();
+        // Keep only the first 5 query
+        if (recentQuery.length > 5) {
+            recentQuery.pop();
+        }
+
+        // Update the display
+        displayrecentQuery(recentQuery);
     }
-
-    // Update the display
-    displayrecentQuery(recentQuery);
-  }
 }
 
 function displayrecentQuery(recentQueries) {
-  // Clear the container
-  recentQueryContainer.innerHTML = "";
+    // Clear the container
+    recentQueryContainer.innerHTML = "";
 
-  const header = document.createElement("h2");
-  header.textContent = "Recent Queries";
-  recentQueryContainer.appendChild(header);
+    const header = document.createElement("h2");
+    header.textContent = "Recent Queries";
+    recentQueryContainer.appendChild(header);
 
-  // Create pills for each query
-  recentQueries.forEach((query) => {
-    const pill = document.createElement("div");
-    pill.className = "pill";
-    pill.textContent = query;
-    pill.onclick = () => {
-      // Handle pill click by triggering the keyup event for Enter key
-      searchBox.value = query;
-      const event = new KeyboardEvent("keyup", {
-        key: "Enter",
-        keyCode: 13,
-        which: 13,
-        bubbles: true,
-      });
-      searchBox.dispatchEvent(event);
-    };
-    recentQueryContainer.appendChild(pill);
-  });
+    // Create pills for each query
+    recentQueries.forEach((query) => {
+        const pill = document.createElement("div");
+        pill.className = "pill";
+        pill.textContent = query;
+        pill.onclick = () => {
+            // Handle pill click by triggering the keyup event for Enter key
+            searchBox.value = query;
+            const event = new KeyboardEvent("keyup", {
+                key: "Enter",
+                keyCode: 13,
+                which: 13,
+                bubbles: true,
+            });
+            searchBox.dispatchEvent(event);
+        };
+        recentQueryContainer.appendChild(pill);
+    });
 }
 
 function fetchGoogleDriveResults(query) {
-  fetchResults("google-drive", query, displayGoogleDriveResults);
+    fetchResults("googleDrive", query, displayGoogleDriveResults);
 }
 
 function fetchWikiResults(query) {
-  fetchResults("wiki", query, displayWikiResults);
+    fetchResults("wiki", query, displayWikiResults);
 }
 
 function fetchJiraResults(query) {
-  fetchResults("jira", query, displayJiraResults);
+    fetchResults("jira", query, displayJiraResults);
 }
 
 function fetchAsanaResults(query) {
-  fetchResults("asana", query, displayAsanaResults);
+    fetchResults("asana", query, displayAsanaResults);
 }
 
 function displayGoogleDriveResults(results) {
-  googleDriveResultsContainer.innerHTML = ""; // Clear previous results and add header
+    googleDriveResultsContainer.innerHTML = ""; // Clear previous results and add header
 
-  const header = document.createElement("h2");
-  header.textContent = "Google Drive";
-  googleDriveResultsContainer.appendChild(header);
+    const header = document.createElement("h2");
+    header.textContent = "Google Drive";
+    googleDriveResultsContainer.appendChild(header);
 
-  if (results.length === 0) {
-    googleDriveResultsContainer.innerHTML += "<p>No results found</p>";
-    return;
-  }
+    if (results.length === 0) {
+        googleDriveResultsContainer.innerHTML += "<p>No results found</p>";
+        return;
+    }
 
-  results.forEach((result) => {
-    const resultItem = document.createElement("div");
-    resultItem.className = "result-item";
+    results.forEach((result) => {
+        const resultItem = document.createElement("div");
+        resultItem.className = "result-item";
 
-    const icon = document.createElement("div");
-    icon.innerHTML = googleDriveLogo; // Use the Google Drive logo
-    icon.className = "result-icon";
+        const icon = document.createElement("div");
+        icon.innerHTML = googleDriveLogo; // Use the Google Drive logo
+        icon.className = "result-icon";
 
-    const resultLink = document.createElement("a");
-    resultLink.href = result.webViewLink; // Use the webViewLink for the link
-    resultLink.target = "_blank";
-    resultLink.innerText = result.name; // Use the name for the link text
+        const resultLink = document.createElement("a");
+        resultLink.href = result.webViewLink; // Use the webViewLink for the link
+        resultLink.target = "_blank";
+        resultLink.innerText = result.name; // Use the name for the link text
 
-    resultItem.appendChild(icon);
-    resultItem.appendChild(resultLink);
-    googleDriveResultsContainer.appendChild(resultItem);
-  });
+        resultItem.appendChild(icon);
+        resultItem.appendChild(resultLink);
+        googleDriveResultsContainer.appendChild(resultItem);
+    });
 }
 
 function displayWikiResults(results) {
-  wikiResultsContainer.innerHTML = ""; // Clear previous results and add header
+    wikiResultsContainer.innerHTML = ""; // Clear previous results and add header
 
-  const header = document.createElement("h2");
-  header.textContent = "Wiki";
-  wikiResultsContainer.appendChild(header);
+    const header = document.createElement("h2");
+    header.textContent = "Wiki";
+    wikiResultsContainer.appendChild(header);
 
-  if (results.length === 0) {
-    wikiResultsContainer.innerHTML += "<p>No results found</p>";
-    return;
-  }
+    if (results.length === 0) {
+        wikiResultsContainer.innerHTML += "<p>No results found</p>";
+        return;
+    }
 
-  results.forEach((result) => {
-    const resultItem = document.createElement("div");
-    resultItem.className = "result-item";
+    results.forEach((result) => {
+        const resultItem = document.createElement("div");
+        resultItem.className = "result-item";
 
-    const resultLink = document.createElement("a");
-    resultLink.href = result["link"];
-    resultLink.target = "_blank";
-    resultLink.innerText = result["title"]; // Use the title for the link text
+        const resultLink = document.createElement("a");
+        resultLink.href = result["link"];
+        resultLink.target = "_blank";
+        resultLink.innerText = result["title"]; // Use the title for the link text
 
-    // const resultDescription = document.createElement("p");
-    // resultDescription.innerHTML =
-    //   result["body.body.view.value"].slice(0, 200) + "..."; // Limit text to first 200 characters
+        // const resultDescription = document.createElement("p");
+        // resultDescription.innerHTML =
+        //   result["body.body.view.value"].slice(0, 200) + "..."; // Limit text to first 200 characters
 
-    const icon = document.createElement("div");
-    icon.innerHTML = confluenceLogo; // Use the Confluence logo
-    icon.className = "result-icon";
+        const icon = document.createElement("div");
+        icon.innerHTML = confluenceLogo; // Use the Confluence logo
+        icon.className = "result-icon";
 
-    resultItem.appendChild(icon);
-    resultItem.appendChild(resultLink);
-    //resultItem.appendChild(resultDescription);
-    wikiResultsContainer.appendChild(resultItem);
-  });
+        resultItem.appendChild(icon);
+        resultItem.appendChild(resultLink);
+        //resultItem.appendChild(resultDescription);
+        wikiResultsContainer.appendChild(resultItem);
+    });
 }
 
 function displayJiraResults(issues) {
-  jiraResultsContainer.innerHTML = ""; // Clear previous results and add header
+    jiraResultsContainer.innerHTML = ""; // Clear previous results and add header
 
-  const header = document.createElement("h2");
-  header.textContent = "Jira";
-  jiraResultsContainer.appendChild(header);
+    const header = document.createElement("h2");
+    header.textContent = "Jira";
+    jiraResultsContainer.appendChild(header);
 
-  if (issues.length === 0) {
-    jiraResultsContainer.innerHTML += "<p>No results found</p>";
-    return;
-  }
+    if (issues.length === 0) {
+        jiraResultsContainer.innerHTML += "<p>No results found</p>";
+        return;
+    }
 
-  issues.forEach((issue) => {
-    const issueItem = document.createElement("div");
-    issueItem.className = "result-item";
+    issues.forEach((issue) => {
+        const issueItem = document.createElement("div");
+        issueItem.className = "result-item";
 
-    const issueLink = document.createElement("a");
-    issueLink.href = `https://jira.caremessage.org/browse/${issue.key}`;
-    issueLink.target = "_blank";
-    issueLink.innerText = issue.fields.summary; // Use the summary for the link text
+        const issueLink = document.createElement("a");
+        issueLink.href = `https://jira.caremessage.org/browse/${issue.key}`;
+        issueLink.target = "_blank";
+        issueLink.innerText = issue.fields.summary; // Use the summary for the link text
 
-    const icon = document.createElement("div");
-    icon.innerHTML = jiraLogo; // Use the Jira logo
-    icon.className = "result-icon";
+        const icon = document.createElement("div");
+        icon.innerHTML = jiraLogo; // Use the Jira logo
+        icon.className = "result-icon";
 
-    issueItem.appendChild(icon);
-    issueItem.appendChild(issueLink);
-    //issueItem.appendChild(issueDescription);
-    jiraResultsContainer.appendChild(issueItem);
-  });
+        issueItem.appendChild(icon);
+        issueItem.appendChild(issueLink);
+        //issueItem.appendChild(issueDescription);
+        jiraResultsContainer.appendChild(issueItem);
+    });
 }
 
 function displayAsanaResults(results) {
-  asanaResultsContainer.innerHTML = ""; // Clear previous results and add header
+    asanaResultsContainer.innerHTML = ""; // Clear previous results and add header
 
-  const header = document.createElement("h2");
-  header.textContent = "Asana";
-  asanaResultsContainer.appendChild(header);
+    const header = document.createElement("h2");
+    header.textContent = "Asana";
+    asanaResultsContainer.appendChild(header);
 
-  if (results.length === 0) {
-    asanaResultsContainer.innerHTML += "<p>No results found</p>";
-    return;
-  }
+    if (results.length === 0) {
+        asanaResultsContainer.innerHTML += "<p>No results found</p>";
+        return;
+    }
 
-  results.forEach((result) => {
-    const resultItem = document.createElement("div");
-    resultItem.className = "result-item";
+    results.forEach((result) => {
+        const resultItem = document.createElement("div");
+        resultItem.className = "result-item";
 
-    const resultLink = document.createElement("a");
-    resultLink.href = `https://app.asana.com/0/search?q=${encodeURIComponent(
-      result.name
-    )}&searched_type=task&child=${result.gid}&f=true`;
-    resultLink.target = "_blank";
-    resultLink.innerText = result.name; // Use the name for the link text
+        const resultLink = document.createElement("a");
+        resultLink.href = `https://app.asana.com/0/search?q=${encodeURIComponent(
+            result.name
+        )}&searched_type=task&child=${result.gid}&f=true`;
+        resultLink.target = "_blank";
+        resultLink.innerText = result.name; // Use the name for the link text
 
-    const icon = document.createElement("div");
-    icon.innerHTML = asanaLogo; // Use the Asana logo
-    icon.className = "result-icon";
+        const icon = document.createElement("div");
+        icon.innerHTML = asanaLogo; // Use the Asana logo
+        icon.className = "result-icon";
 
-    resultItem.appendChild(icon);
-    resultItem.appendChild(resultLink);
-    asanaResultsContainer.appendChild(resultItem);
-  });
+        resultItem.appendChild(icon);
+        resultItem.appendChild(resultLink);
+        asanaResultsContainer.appendChild(resultItem);
+    });
 }
