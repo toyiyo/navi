@@ -15,6 +15,39 @@ closeChatPanelButton.addEventListener("click", () => {
   openChatPanelButton.classList.remove("hidden");
 });
 
+// Ensure the chat panel stays within the viewport when resized horizontally
+chatPanel.addEventListener("resize", () => {
+  const rect = chatPanel.getBoundingClientRect();
+  if (rect.right > window.innerWidth) {
+    chatPanel.style.width = `${window.innerWidth - rect.left}px`;
+  }
+});
+
+// Add resize functionality
+const resizeHandle = document.querySelector('.resize-handle');
+let isResizing = false;
+let startX, startWidth;
+
+resizeHandle.addEventListener('mousedown', (e) => {
+    isResizing = true;
+    startX = e.clientX;
+    startWidth = parseInt(getComputedStyle(chatPanel).width, 10);
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', () => {
+        isResizing = false;
+        document.removeEventListener('mousemove', handleMouseMove);
+    });
+});
+
+function handleMouseMove(e) {
+    if (!isResizing) return;
+    
+    const width = startWidth + (startX - e.clientX);
+    if (width >= 300 && width <= 800) { // Respect min and max width
+        chatPanel.style.width = `${width}px`;
+    }
+}
+
 const handleSendChat = async () => {
     const userInput = DOMPurify.sanitize(chatInput.value);
     if (!userInput) {
