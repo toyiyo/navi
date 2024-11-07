@@ -78,4 +78,5 @@ function displayChatResponse(data) {
 
   chatResponseContainer.appendChild(responseElement);
   chatInput.value = ""; // Clear the input field
+  responseElement.scrollIntoView({behavior: "smooth"}); // Scroll to the response
 }
