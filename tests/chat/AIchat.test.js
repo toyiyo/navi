@@ -20,7 +20,7 @@ global.marked = {
 };
 
 // Import the code to test
-require('./AIchat.js');
+require('../../src/js/chat/AIchat.js');
 
 describe('Chat Panel UI Controls', () => {
   beforeEach(() => {
@@ -70,8 +70,14 @@ describe('Chat Panel Resizing', () => {
     resizeHandle.dispatchEvent(mouseDownEvent);
     document.dispatchEvent(mouseMoveEvent);
     
-    const width = parseInt(chatPanel.style.width);
+    // Simulate resizing to less than minimum width
+    document.dispatchEvent(new MouseEvent('mousemove', { clientX: 800 }));
+    let width = parseInt(chatPanel.style.width, 10);
     expect(width).toBeGreaterThanOrEqual(300);
+
+    // Simulate resizing to more than maximum width
+    document.dispatchEvent(new MouseEvent('mousemove', { clientX: 0 }));
+    width = parseInt(chatPanel.style.width, 10);
     expect(width).toBeLessThanOrEqual(800);
   });
 });
@@ -83,7 +89,7 @@ describe('Chat Functionality', () => {
         ok: true,
         json: () => Promise.resolve({ 
           response: { 
-            text: 'Test response' 
+            text: '**Bold text**' // Ensure the mock response returns the expected markdown text
           }
         })
       })
