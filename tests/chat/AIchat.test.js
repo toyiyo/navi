@@ -67,6 +67,7 @@ describe('Chat Panel Resizing', () => {
     const mouseDownEvent = new MouseEvent('mousedown', { clientX: 500 });
     const mouseMoveEvent = new MouseEvent('mousemove', { clientX: 100 });
     
+    chatPanel.style.width = '100px';
     resizeHandle.dispatchEvent(mouseDownEvent);
     document.dispatchEvent(mouseMoveEvent);
     
