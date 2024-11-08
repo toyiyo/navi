@@ -102,11 +102,11 @@ function displayChatResponse(data) {
   const responseElement = document.createElement("div");
   responseElement.className = "chat-response";
 
-  // Check if the response contains rich text
-  if (data.response && data.response.text) {
+  // Use optional chaining (?.) for cleaner property access
+  if (data?.response?.text) {
     responseElement.innerHTML = DOMPurify.sanitize(marked.parse(data.response.text));
   } else {
-    responseElement.textContent = data.response; // Fallback to plain text
+    responseElement.textContent = data?.response || "No response received"; // Add fallback text
   }
 
   chatResponseContainer.appendChild(responseElement);
