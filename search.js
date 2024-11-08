@@ -1,5 +1,5 @@
 // Constants
-const API_BASE_URL = "https://2fff-2600-1700-1101-6de0-2105-cf27-50a6-4499.ngrok-free.app/webhook";
+const API_BASE_URL = "http://localhost:443/webhook";
 const HEADERS = { "ngrok-skip-browser-warning": "69420" };
 const MAX_RESULTS = 5;
 const MAX_RECENT_QUERIES = 5;
