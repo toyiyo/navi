@@ -1,3 +1,5 @@
+import { fetchResults } from '../utils/utils.js';
+
 const openChatPanelButton = document.getElementById("openChatPanel");
 const closeChatPanelButton = document.getElementById("closeChatPanel");
 const chatPanel = document.getElementById("chatPanel");
@@ -62,7 +64,7 @@ const handleSendChat = async () => {
     sendChatButton.appendChild(loadingSpinner);
 
     try {
-      const response = await fetch("https://2fff-2600-1700-1101-6de0-2105-cf27-50a6-4499.ngrok-free.app/webhook/d3666369-8f13-4076-81e8-11f32d91d6fa/chat", {
+      const data = await fetchResults("3b1d3130-4233-4f17-9bf0-0f368211a63e/chat", userInput, null, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -74,11 +76,6 @@ const handleSendChat = async () => {
         }),
       });
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const data = await response.json();
       displayChatResponse(data);
     } catch (error) {
       console.error("Error fetching chat response:", error);
@@ -90,13 +87,13 @@ const handleSendChat = async () => {
     }
   };
 
-  sendChatButton.addEventListener("click", handleSendChat);
+sendChatButton.addEventListener("click", handleSendChat);
 
-  chatInput.addEventListener("keyup", (event) => {
-    if (event.key === "Enter") {
-      handleSendChat();
-    }
-  });
+chatInput.addEventListener("keyup", (event) => {
+  if (event.key === "Enter") {
+    handleSendChat();
+  }
+});
 
 function displayChatResponse(data) {
   const responseElement = document.createElement("div");
