@@ -277,3 +277,23 @@ document.addEventListener("keydown", (e) => {
     searchBox.focus();
   }
 });
+
+// Add this function to the existing code
+function initializeFromLocalStorage() {
+  // Display recent queries
+  const storedQueries = getFromLocalStorage("recentQueries") || [];
+  if (storedQueries.length > 0) {
+    displayRecentQuery(storedQueries);
+  }
+  
+  // Display recent links
+  const storedLinks = getFromLocalStorage("recentLinks") || [];
+  if (storedLinks.length > 0) {
+    displayRecentAccessedLinks(storedLinks);
+  }
+}
+
+// Add this call at the end of your file or in a document ready function
+document.addEventListener("DOMContentLoaded", function() {
+  initializeFromLocalStorage();
+});
