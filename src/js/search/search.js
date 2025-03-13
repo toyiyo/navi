@@ -1,4 +1,8 @@
-import { fetchResults } from '../utils/utils.js';
+import {
+  fetchResults,
+  saveToLocalStorage,
+  getFromLocalStorage,
+} from "../utils/utils.js";
 // Constants
 const API_BASE_URL = "http://localhost:443/webhook";
 const HEADERS = { "ngrok-skip-browser-warning": "69420" };
@@ -12,9 +16,12 @@ const searchBox = document.getElementById("searchBox");
 const wikiResultsContainer = document.getElementById("wikiResults");
 const jiraResultsContainer = document.getElementById("jiraResults");
 const asanaResultsContainer = document.getElementById("asanaResults");
-const googleDriveResultsContainer = document.getElementById("googleDriveResults");
+const googleDriveResultsContainer =
+  document.getElementById("googleDriveResults");
 const recentQueryContainer = document.getElementById("recentQueryContainer");
-const recentAccessedLinksContainer = document.getElementById("recentAccessedLinksContainer");
+const recentAccessedLinksContainer = document.getElementById(
+  "recentAccessedLinksContainer"
+);
 
 // Logos
 const googleDriveLogo = `<svg viewBox="0 0 87.3 78" xmlns="http://www.w3.org/2000/svg">
@@ -33,8 +40,8 @@ const asanaLogo = `<svg viewBox="0 0 751 495" fill="none" xmlns="http://www.w3.o
                   <path d="M183.182 457.221C194.968 465.386 207.825 469.35 220.189 469.35C231.954 469.35 244.125 463.243 244.125 452.614C244.125 438.429 217.597 436.221 200.947 430.564C184.275 424.907 169.918 413.186 169.918 394.243C169.918 365.229 195.761 353.25 219.889 353.25C235.168 353.25 250.939 358.286 261.182 365.507C264.697 368.186 262.554 371.25 262.554 371.25L252.782 385.2C251.689 386.764 249.761 388.136 247.018 386.421C244.254 384.729 234.611 377.893 219.889 377.893C205.168 377.893 196.297 384.686 196.297 393.107C196.297 403.221 207.825 406.393 221.325 409.843C244.854 416.186 270.504 423.814 270.504 452.636C270.504 478.2 246.589 493.993 220.168 493.993C200.132 493.993 183.097 488.293 168.804 477.793C165.825 474.814 167.904 472.05 167.904 472.05L177.611 458.186C179.604 455.571 182.089 456.471 183.182 457.221Z" fill="#0D0E10"/>
                   <path d="M436.875 61.7571C436.875 95.85 409.232 123.514 375.139 123.514C341.025 123.514 313.382 95.8714 313.382 61.7571C313.382 27.6429 341.025 0 375.139 0C409.232 0 436.875 27.6429 436.875 61.7571ZM294.91 138.943C260.818 138.943 233.153 166.586 233.153 200.679C233.153 234.771 260.796 262.436 294.91 262.436C329.025 262.436 356.668 234.793 356.668 200.679C356.668 166.586 329.025 138.943 294.91 138.943ZM455.346 138.943C421.232 138.943 393.589 166.586 393.589 200.7C393.589 234.814 421.232 262.457 455.346 262.457C489.439 262.457 517.103 234.814 517.103 200.7C517.103 166.586 489.46 138.943 455.346 138.943Z" fill="#F06A6A"/>
                   </svg>`;
-                  const confluenceLogo = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 32 32"><defs><linearGradient id="a" x1="28.607" y1="-60.825" x2="11.085" y2="-50.756" gradientTransform="matrix(1, 0, 0, -1, 0, -29.66)" gradientUnits="userSpaceOnUse"><stop offset="0.18" stop-color="#0052cc"/><stop offset="1" stop-color="#2684ff"/></linearGradient><linearGradient id="b" x1="621.442" y1="1817.567" x2="603.915" y2="1827.64" gradientTransform="matrix(-1, 0, 0, 1, 624.83, -1816.71)" xlink:href="#a"/></defs><title>file_type_confluence</title><path d="M3.015,23.087c-.289.472-.614,1.02-.891,1.456a.892.892,0,0,0,.3,1.212l5.792,3.564a.89.89,0,0,0,1.226-.29l.008-.013c.231-.387.53-.891.855-1.43,2.294-3.787,4.6-3.323,8.763-1.336l5.743,2.731A.892.892,0,0,0,26,28.559l.011-.024L28.766,22.3a.891.891,0,0,0-.445-1.167c-1.212-.57-3.622-1.707-5.792-2.754C14.724,14.586,8.09,14.831,3.015,23.087Z" style="fill:url(#a)"/><path d="M28.985,8.932c.289-.472.614-1.02.891-1.456a.892.892,0,0,0-.3-1.212L23.785,2.7a.89.89,0,0,0-1.236.241.584.584,0,0,0-.033.053c-.232.387-.53.891-.856,1.43-2.294,3.787-4.6,3.323-8.763,1.336L7.172,3.043a.89.89,0,0,0-1.187.421l-.011.024L3.216,9.726a.891.891,0,0,0,.445,1.167c1.212.57,3.622,1.706,5.792,2.753C17.276,17.433,23.91,17.179,28.985,8.932Z" style="fill:url(#b)"/></svg>`;
-                  const jiraLogo = `<svg viewBox="0 0 76 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+const confluenceLogo = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 32 32"><defs><linearGradient id="a" x1="28.607" y1="-60.825" x2="11.085" y2="-50.756" gradientTransform="matrix(1, 0, 0, -1, 0, -29.66)" gradientUnits="userSpaceOnUse"><stop offset="0.18" stop-color="#0052cc"/><stop offset="1" stop-color="#2684ff"/></linearGradient><linearGradient id="b" x1="621.442" y1="1817.567" x2="603.915" y2="1827.64" gradientTransform="matrix(-1, 0, 0, 1, 624.83, -1816.71)" xlink:href="#a"/></defs><title>file_type_confluence</title><path d="M3.015,23.087c-.289.472-.614,1.02-.891,1.456a.892.892,0,0,0,.3,1.212l5.792,3.564a.89.89,0,0,0,1.226-.29l.008-.013c.231-.387.53-.891.855-1.43,2.294-3.787,4.6-3.323,8.763-1.336l5.743,2.731A.892.892,0,0,0,26,28.559l.011-.024L28.766,22.3a.891.891,0,0,0-.445-1.167c-1.212-.57-3.622-1.707-5.792-2.754C14.724,14.586,8.09,14.831,3.015,23.087Z" style="fill:url(#a)"/><path d="M28.985,8.932c.289-.472.614-1.02.891-1.456a.892.892,0,0,0-.3-1.212L23.785,2.7a.89.89,0,0,0-1.236.241.584.584,0,0,0-.033.053c-.232.387-.53.891-.856,1.43-2.294,3.787-4.6,3.323-8.763,1.336L7.172,3.043a.89.89,0,0,0-1.187.421l-.011.024L3.216,9.726a.891.891,0,0,0,.445,1.167c1.212.57,3.622,1.706,5.792,2.753C17.276,17.433,23.91,17.179,28.985,8.932Z" style="fill:url(#b)"/></svg>`;
+const jiraLogo = `<svg viewBox="0 0 76 32" fill="none" xmlns="http://www.w3.org/2000/svg">
                                         <g id="logo-gradient-blue-jira">
                                         <g id="Jira">
                                         <path d="M38.8963 6.13371H41.7283V20.1309C41.7283 23.8217 40.0434 26.3983 36.1359 26.3983C34.6661 26.3983 33.5189 26.1546 32.7302 25.876V23.195C33.5906 23.5432 34.6302 23.7173 35.6698 23.7173C38.0717 23.7173 38.8963 22.3245 38.8963 20.305V6.13371Z" fill="#253858"/>
@@ -58,12 +65,11 @@ const asanaLogo = `<svg viewBox="0 0 751 495" fill="none" xmlns="http://www.w3.o
                                         <stop offset="1" stop-color="#2684FF"/>
                                         </linearGradient>
                                         </defs>
-                                        </svg>`;
-
+                  </svg>`;
 
 // State
-let recentQuery = [];
-let recentAccessedLinks = [];
+let recentQuery = getFromLocalStorage("recentQueries") || [];
+let recentAccessedLinks = getFromLocalStorage("recentLinks") || [];
 
 // Event Listeners
 searchBox.addEventListener("keyup", handleSearch);
@@ -71,148 +77,223 @@ document.addEventListener("click", handleLinkClick);
 
 // Functions
 function createLoadingSpinner() {
-    const spinner = document.createElement("div");
-    spinner.className = "loading-spinner";
-    return spinner;
+  const spinner = document.createElement("div");
+  spinner.className = "loading-spinner";
+  return spinner;
 }
 
 function handleSearch(event) {
-    if (event.key === "Enter") {
-        const query = searchBox.value;
-        fetchResults("wiki", query, displayWikiResults);
-        fetchResults("jira", query, displayJiraResults);
-        fetchResults("asana", query, displayAsanaResults);
-        fetchResults("googleDrive", query, displayGoogleDriveResults);
-        addRecentQuery(query);
-    }
+  if (event.key === "Enter") {
+    const query = searchBox.value;
+    fetchResults("wiki", query, displayWikiResults);
+    fetchResults("jira", query, displayJiraResults);
+    fetchResults("asana", query, displayAsanaResults);
+    fetchResults("googleDrive", query, displayGoogleDriveResults);
+    addRecentQuery(query);
+  }
 }
 
 function handleLinkClick(event) {
-    if (event.target.tagName === "A" && event.target.parentElement.classList.contains("result-item")) {
-        addRecentAccessedLink(event.target);
-    }
+  if (
+    event.target.tagName === "A" &&
+    event.target.parentElement.classList.contains("result-item")
+  ) {
+    addRecentAccessedLink(event.target);
+  }
 }
 
 function addRecentAccessedLink(link) {
-    if (!recentAccessedLinks.includes(link)) {
-        recentAccessedLinks.unshift(link);
-        if (recentAccessedLinks.length > MAX_RECENT_LINKS) {
-            recentAccessedLinks.pop();
-        }
-        displayRecentAccessedLinks(recentAccessedLinks);
+  const linkData = {
+    href: link.href,
+    text: link.innerText,
+    icon: link.previousSibling.innerHTML,
+  };
+
+  if (!recentAccessedLinks.some((l) => l.href === linkData.href)) {
+    recentAccessedLinks.unshift(linkData);
+    if (recentAccessedLinks.length > MAX_RECENT_LINKS) {
+      recentAccessedLinks.pop();
     }
+    saveToLocalStorage("recentLinks", recentAccessedLinks);
+    displayRecentAccessedLinks(recentAccessedLinks);
+  }
 }
 
 function displayRecentAccessedLinks(recentLinks) {
-    recentAccessedLinksContainer.innerHTML = "";
-    const header = document.createElement("h2");
-    header.textContent = "Recent Accessed Links";
-    recentAccessedLinksContainer.appendChild(header);
+  recentAccessedLinksContainer.innerHTML = "";
+  const header = document.createElement("h2");
+  header.textContent = "Recent Accessed Links";
+  recentAccessedLinksContainer.appendChild(header);
 
-    const row = document.createElement("div");
-    row.className = "row";
+  const row = document.createElement("div");
+  row.className = "row";
 
-    recentLinks.forEach((link) => {
-        const col = document.createElement("div");
-        col.className = "col";
+  recentLinks.forEach((link) => {
+    const col = document.createElement("div");
+    col.className = "col";
 
-        const card = document.createElement("div");
-        card.className = "card";
+    const card = document.createElement("div");
+    card.className = "card";
 
-        const cardBody = document.createElement("div");
-        cardBody.className = "card-body";
+    const cardBody = document.createElement("div");
+    cardBody.className = "card-body";
 
-        const cardTitle = document.createElement("a");
-        cardTitle.className = "card-title";
-        cardTitle.textContent = link.innerHTML;
-        cardTitle.href = link;
-        cardTitle.target = "_blank";
+    const cardTitle = document.createElement("a");
+    cardTitle.href = link.href;
+    cardTitle.className = "card-title";
+    cardTitle.textContent = link.text;
+    cardTitle.target = "_blank"; // Open in new tab
 
-        const originalIcon = link.previousSibling;
-        const iconContainer = originalIcon.cloneNode(true);
-        iconContainer.className = "result-icon";
+    const iconSpan = document.createElement("span");
+    iconSpan.className = "link-icon";
+    iconSpan.innerHTML = link.icon;
+    
+    cardBody.appendChild(iconSpan);
+    cardBody.appendChild(cardTitle);
+    card.appendChild(cardBody);
+    col.appendChild(card);
+    row.appendChild(col);
+  });
 
-        cardBody.appendChild(iconContainer);
-        cardBody.appendChild(cardTitle);
-        card.appendChild(cardBody);
-        col.appendChild(card);
-        row.appendChild(col);
-    });
-
-    recentAccessedLinksContainer.appendChild(row);
+  recentAccessedLinksContainer.appendChild(row);
 }
 
 function addRecentQuery(query) {
-    if (!recentQuery.includes(query)) {
-        recentQuery.unshift(query);
-        if (recentQuery.length > MAX_RECENT_QUERIES) {
-            recentQuery.pop();
-        }
-        displayRecentQuery(recentQuery);
+  if (!recentQuery.includes(query)) {
+    recentQuery.unshift(query);
+    if (recentQuery.length > MAX_RECENT_QUERIES) {
+      recentQuery.pop();
     }
+    saveToLocalStorage("recentQueries", recentQuery);
+    displayRecentQuery(recentQuery);
+  }
 }
 
 function displayRecentQuery(recentQueries) {
-    recentQueryContainer.innerHTML = "";
-    const header = document.createElement("h2");
-    header.textContent = "Recent Queries";
-    recentQueryContainer.appendChild(header);
+  recentQueryContainer.innerHTML = "";
+  const header = document.createElement("h2");
+  header.textContent = "Recent Queries";
+  recentQueryContainer.appendChild(header);
 
-    recentQueries.forEach((query) => {
-        const pill = document.createElement("div");
-        pill.className = "pill";
-        pill.textContent = query;
-        pill.onclick = () => {
-            searchBox.value = query;
-            const event = new KeyboardEvent("keyup", { key: "Enter", keyCode: 13, which: 13, bubbles: true });
-            searchBox.dispatchEvent(event);
-        };
-        recentQueryContainer.appendChild(pill);
-    });
+  recentQueries.forEach((query) => {
+    const pill = document.createElement("div");
+    pill.className = "pill";
+    pill.textContent = query;
+    pill.onclick = () => {
+      searchBox.value = query;
+      const event = new KeyboardEvent("keyup", {
+        key: "Enter",
+        keyCode: 13,
+        which: 13,
+        bubbles: true,
+      });
+      searchBox.dispatchEvent(event);
+    };
+    recentQueryContainer.appendChild(pill);
+  });
 }
 
 function displayGoogleDriveResults(results) {
-    displayResults(googleDriveResultsContainer, "Google Drive", results, googleDriveLogo, (result) => result.webViewLink, (result) => result.name);
+  displayResults(
+    googleDriveResultsContainer,
+    "Google Drive",
+    results,
+    googleDriveLogo,
+    (result) => result.webViewLink,
+    (result) => result.name
+  );
 }
 
 function displayWikiResults(results) {
-    displayResults(wikiResultsContainer, "Wiki", results, confluenceLogo, (result) => result.link, (result) => result.title);
+  displayResults(
+    wikiResultsContainer,
+    "Wiki",
+    results,
+    confluenceLogo,
+    (result) => result.link,
+    (result) => result.title
+  );
 }
 
 function displayJiraResults(issues) {
-    displayResults(jiraResultsContainer, "Jira", issues, jiraLogo, (issue) => `https://jira.caremessage.org/browse/${issue.key}`, (issue) => issue.fields.summary);
+  displayResults(
+    jiraResultsContainer,
+    "Jira",
+    issues,
+    jiraLogo,
+    (issue) => `https://jira.caremessage.org/browse/${issue.key}`,
+    (issue) => issue.fields.summary
+  );
 }
 
 function displayAsanaResults(results) {
-    displayResults(asanaResultsContainer, "Asana", results, asanaLogo, (result) => `https://app.asana.com/0/search?q=${encodeURIComponent(result.name)}&searched_type=task&child=${result.gid}&f=true`, (result) => result.name);
+  displayResults(
+    asanaResultsContainer,
+    "Asana",
+    results,
+    asanaLogo,
+    (result) =>
+      `https://app.asana.com/0/search?q=${encodeURIComponent(
+        result.name
+      )}&searched_type=task&child=${result.gid}&f=true`,
+    (result) => result.name
+  );
 }
 
 function displayResults(container, headerText, results, logo, linkFn, textFn) {
-    container.innerHTML = "";
-    const header = document.createElement("h2");
-    header.textContent = headerText;
-    container.appendChild(header);
+  container.innerHTML = "";
+  const header = document.createElement("h2");
+  header.textContent = headerText;
+  container.appendChild(header);
 
-    if (results.length === 0) {
-        container.innerHTML += "<p>No results found</p>";
-        return;
-    }
+  if (results.length === 0) {
+    container.innerHTML += "<p>No results found</p>";
+    return;
+  }
 
-    results.forEach((result) => {
-        const resultItem = document.createElement("div");
-        resultItem.className = "result-item";
+  results.forEach((result) => {
+    const resultItem = document.createElement("div");
+    resultItem.className = "result-item";
 
-        const icon = document.createElement("div");
-        icon.innerHTML = logo;
-        icon.className = "result-icon";
+    const icon = document.createElement("div");
+    icon.innerHTML = logo;
+    icon.className = "result-icon";
 
-        const resultLink = document.createElement("a");
-        resultLink.href = linkFn(result);
-        resultLink.target = "_blank";
-        resultLink.innerText = textFn(result);
+    const resultLink = document.createElement("a");
+    resultLink.href = linkFn(result);
+    resultLink.target = "_blank";
+    resultLink.innerText = textFn(result);
 
-        resultItem.appendChild(icon);
-        resultItem.appendChild(resultLink);
-        container.appendChild(resultItem);
-    });
+    resultItem.appendChild(icon);
+    resultItem.appendChild(resultLink);
+    container.appendChild(resultItem);
+  });
 }
+
+// Add keyboard navigation
+document.addEventListener("keydown", (e) => {
+  if (e.key === "/" && document.activeElement !== searchBox) {
+    e.preventDefault();
+    searchBox.focus();
+  }
+});
+
+// Add this function to the existing code
+function initializeFromLocalStorage() {
+  // Display recent queries
+  const storedQueries = getFromLocalStorage("recentQueries") || [];
+  if (storedQueries.length > 0) {
+    displayRecentQuery(storedQueries);
+  }
+  
+  // Display recent links
+  const storedLinks = getFromLocalStorage("recentLinks") || [];
+  if (storedLinks.length > 0) {
+    displayRecentAccessedLinks(storedLinks);
+  }
+}
+
+// Add this call at the end of your file or in a document ready function
+document.addEventListener("DOMContentLoaded", function() {
+  initializeFromLocalStorage();
+});
