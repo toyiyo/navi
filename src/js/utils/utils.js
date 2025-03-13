@@ -37,14 +37,7 @@ export async function fetchResults(endpoint, query, displayFunction, options = {
     } catch (error) {
         console.error(`Error fetching ${endpoint} results:`, error);
         if (container) {
-            container.innerHTML = `
-                <div class="error-container">
-                    <i class="fas fa-exclamation-circle"></i>
-                    <p>Sorry, something went wrong. Please try again later.</p>
-                    <button onclick="retrySearch('${endpoint}', '${query}')" class="retry-button">
-                        <i class="fas fa-redo"></i> Retry
-                    </button>
-                </div>`;
+            renderErrorMessage(endpoint, query, container);
         }
         throw error;
     } finally {
@@ -52,6 +45,35 @@ export async function fetchResults(endpoint, query, displayFunction, options = {
             container.removeChild(loadingSpinner);
         }
     }
+}
+
+function renderErrorMessage(endpoint, query, container) {
+    const errorContainer = document.createElement('div');
+    errorContainer.className = 'error-container';
+
+    const icon = document.createElement('i');
+    icon.className = 'fas fa-exclamation-circle';
+
+    const message = document.createElement('p');
+    message.textContent = 'Sorry, something went wrong. Please try again later.';
+
+    const retryButton = document.createElement('button');
+    retryButton.className = 'retry-button';
+    retryButton.dataset.endpoint = endpoint;
+    retryButton.dataset.query = query;
+
+    const retryIcon = document.createElement('i');
+    retryIcon.className = 'fas fa-redo';
+
+    retryButton.appendChild(retryIcon);
+    retryButton.appendChild(document.createTextNode(' Retry'));
+
+    errorContainer.appendChild(icon);
+    errorContainer.appendChild(message);
+    errorContainer.appendChild(retryButton);
+
+    container.innerHTML = '';
+    container.appendChild(errorContainer);
 }
 
 function createLoadingSpinner() {
