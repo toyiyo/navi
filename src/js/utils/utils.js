@@ -23,12 +23,12 @@ export async function fetchResults(endpoint, query, displayFunction, options = {
             container.appendChild(loadingSpinner);
             spinnerAppended = true;
         }
-        
+
         const response = await fetch(apiUrl, { headers: HEADERS, ...options });
         if (!response.ok) {
             throw new Error(`Server returned ${response.status}: ${response.statusText}`);
         }
-        
+
         const data = await response.json();
         if (displayFunction) {
             displayFunction(data.slice(0, MAX_RESULTS));
@@ -102,16 +102,34 @@ export function getFromLocalStorage(key) {
 }
 
 export function setupRetryHandlers() {
-    document.addEventListener('click', function(event) {
+    document.addEventListener('click', function (event) {
         if (event.target.closest('.retry-button')) {
             const button = event.target.closest('.retry-button');
             const endpoint = button.dataset.endpoint;
             const query = button.dataset.query;
-            
+
             const displayFunction = displayFunctionMap.get(endpoint);
             if (displayFunction) {
                 fetchResults(endpoint, query, displayFunction);
             }
         }
     });
+}
+
+export function logError(error, context = {}) {
+    console.error('Application error:', error, context);
+    // In production, send to error tracking service like Sentry
+    if (process.env.NODE_ENV === 'production') {
+
+    }
+}
+
+export async function initiateOAuthFlow(service) {
+    const response = await fetch(`${config.API_BASE_URL}/auth/${service}`, {
+      method: 'POST',
+      headers: HEADERS
+    });
+    const data = await response.json();
+    // Redirect to authorization URL
+    window.location.href = data.authUrl;
 }

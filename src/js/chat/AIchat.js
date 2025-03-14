@@ -1,4 +1,5 @@
-import { fetchResults } from '../utils/utils.js';
+import { fetchResults }  from '../utils/utils.js';
+import '@css/styles.css';
 
 const openChatPanelButton = document.getElementById("openChatPanel");
 const closeChatPanelButton = document.getElementById("closeChatPanel");

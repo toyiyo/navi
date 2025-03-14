@@ -1,8 +1,4 @@
-import {
-  fetchResults,
-  saveToLocalStorage,
-  getFromLocalStorage,
-} from "../utils/utils.js";
+import { fetchResults, saveToLocalStorage, getFromLocalStorage } from '../utils/utils.js';
 // Constants
 const API_BASE_URL = "http://localhost:443/webhook";
 const HEADERS = { "ngrok-skip-browser-warning": "69420" };
@@ -11,7 +7,6 @@ const MAX_RECENT_QUERIES = 5;
 const MAX_RECENT_LINKS = 4;
 
 // Elements
-const loadingSpinner = createLoadingSpinner();
 const searchBox = document.getElementById("searchBox");
 const wikiResultsContainer = document.getElementById("wikiResults");
 const jiraResultsContainer = document.getElementById("jiraResults");
@@ -75,12 +70,6 @@ let recentAccessedLinks = getFromLocalStorage("recentLinks") || [];
 searchBox.addEventListener("keyup", handleSearch);
 document.addEventListener("click", handleLinkClick);
 
-// Functions
-function createLoadingSpinner() {
-  const spinner = document.createElement("div");
-  spinner.className = "loading-spinner";
-  return spinner;
-}
 
 function handleSearch(event) {
   if (event.key === "Enter") {
@@ -278,6 +267,15 @@ document.addEventListener("keydown", (e) => {
   }
 });
 
+// Add this function to create the connections link
+function createConnectionsLink() {
+  const connectionsLink = document.createElement("a");
+  connectionsLink.href = "html/connections.html";
+  connectionsLink.textContent = "Manage Connections";
+  connectionsLink.className = "connections-link";
+  document.querySelector('.search-container').appendChild(connectionsLink);
+}
+
 // Add this function to the existing code
 function initializeFromLocalStorage() {
   // Display recent queries
@@ -295,5 +293,6 @@ function initializeFromLocalStorage() {
 
 // Add this call at the end of your file or in a document ready function
 document.addEventListener("DOMContentLoaded", function() {
+  createConnectionsLink();
   initializeFromLocalStorage();
 });
