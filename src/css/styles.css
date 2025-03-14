@@ -389,6 +389,113 @@ h2 {
     background: #c82333;
 }
 
+.services-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+  padding: 20px;
+}
+
+.service-connection {
+  background: #fff;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  transition: transform 0.2s ease;
+}
+
+.service-connection:hover {
+  transform: translateY(-2px);
+}
+
+.service-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.service-icon {
+  width: 32px;
+  height: 32px;
+  margin-right: 12px;
+}
+
+.service-name {
+  font-size: 18px;
+  font-weight: 500;
+  color: #172B4D;
+}
+
+.service-status {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.connection-status {
+  font-size: 14px;
+  color: #5E6C84;
+}
+
+.action-button {
+  padding: 8px 16px;
+  border-radius: 4px;
+  border: none;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.action-button.connect {
+  background: #0052CC;
+  color: white;
+}
+
+.action-button.connect:hover {
+  background: #0747A6;
+}
+
+.action-button.disconnect {
+  background: #FFEBE6;
+  color: #DE350B;
+}
+
+.action-button.disconnect:hover {
+  background: #FFBDAD;
+}
+
+.notification {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  padding: 15px 25px;
+  border-radius: 4px;
+  color: white;
+  animation: slideIn 0.3s ease-out;
+  z-index: 1000;
+}
+
+.notification.success {
+  background: #36B37E;
+}
+
+.notification.error {
+  background: #FF5630;
+}
+
+@keyframes slideIn {
+  from { transform: translateY(100%); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+/* Service-specific icons */
+.service-icon.google {
+  background-image: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTgiIGhlaWdodD0iMTgiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHBhdGggZD0iTTE3LjY0IDkuMjA1YzAtLjYzOS0uMDU3LTEuMjUyLS4xNjQtMS44NDFIMzl2My40ODFoNC44NGMtLjIwOSAxLjEyNS0uODQzIDIuMDc4LTEuNzk2IDIuNzE2di4wMDFoLS4wMDFjMS4xMzUuODQ1IDIuNSAxLjM0IDMuOTU1IDEuMzRoLjAwMmMuNTkyIDAgMS4xNi0uMDc3IDEuNjk4LS4yMThoLS4wMDRjLjc1OS0uMjAxIDEuNDYtLjUzNSAyLjA2My0uOTg4bC4wMDQtLjAwM2MuNDA2LS4zMjIuNzYxLS43MTIgMS4wNDktMS4xNDJoLjAwMmMuMjkzLS40MzYuNTA5LS45MjUuNjM2LTEuNDQ3aC4wMDF6IiBmaWxsPSIjNDI4NUY0Ii8+PHBhdGggZD0iTTkgMy45OTNjMS4zMjcgMCAyLjUwMi40NzUgMy40MjcgMS40MDlsLjAwMi4wMDIgMi4wOTItMi4wOTJDMTIuOTAxIDEuNzg1IDExLjA0OSAxIDkgMSA1LjE0MyAxIDIgNC4xNDMgMiA4czMuMTQzIDcgNyA3YzMuODU3IDAgNy0zLjE0MyA3LTd2LTFIOXYzaDQuMDQ1QTQuOTk0IDQuOTk0IDAgMDExNiA4YzAtMi43NjEtMi4yMzktNS01LTV6IiBmaWxsPSIjMzRBODUzIi8+PC9zdmc+');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+}
+
   /* Responsive Design */
   @media (max-width: 768px) {
     .chat-panel {

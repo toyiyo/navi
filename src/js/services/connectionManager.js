@@ -11,10 +11,36 @@ export class ConnectionManager {
     this.headers = {
       'Content-Type': 'application/json'
     };
+    this.initializeOAuthCallback();
+  }
+
+  initializeOAuthCallback() {
+    // Check if there's an OAuth code in the URL (after Google redirect)
+    const urlParams = new URLSearchParams(window.location.search);
+    const code = urlParams.get('code');
+    const state = urlParams.get('state');
+
+    if (code && state) {
+      this.handleOAuthCallback('google', code)
+        .then(result => {
+          if (result.success) {
+            this.showNotification('Successfully connected to Google Drive', 'success');
+          } else {
+            this.showNotification('Failed to connect to Google Drive', 'error');
+          }
+          // Clean up URL
+          window.history.replaceState({}, document.title, window.location.pathname);
+        })
+        .catch(error => {
+          this.showNotification('Authentication failed', 'error');
+          logError(error, { context: 'OAuth callback' });
+        });
+    }
   }
 
   async initiateOAuthFlow(serviceType) {
     if (!SUPPORTED_SERVICES.includes(serviceType)) {
+      this.showNotification('Unsupported service type', 'error');
       throw new Error('Unsupported service type');
     }
 
@@ -23,18 +49,36 @@ export class ConnectionManager {
         `${config.AUTH_ENDPOINTS[serviceType.toUpperCase()]}`,
         null,
         null,
-        { method: 'POST', headers: this.headers }
+        { 
+          method: 'POST', 
+          headers: this.headers,
+          credentials: 'include' // Important for handling cookies
+        }
       );
 
       if (response.authUrl) {
+        // Store current state before redirect
+        saveToLocalStorage('oauth_state', response.state);
         window.location.href = response.authUrl;
       } else {
         throw new Error('No auth URL received');
       }
     } catch (error) {
+      this.showNotification('Failed to start authentication', 'error');
       logError(error, { service: serviceType });
-      throw new Error('Failed to initiate OAuth flow');
+      throw error;
     }
+  }
+
+  showNotification(message, type) {
+    const notification = document.createElement('div');
+    notification.className = `notification ${type}`;
+    notification.textContent = message;
+    document.body.appendChild(notification);
+
+    setTimeout(() => {
+      notification.remove();
+    }, 3000);
   }
 
   async handleOAuthCallback(serviceType, code) {
@@ -89,7 +133,11 @@ export class ConnectionManager {
         `${config.AUTH_ENDPOINTS[serviceType.toUpperCase()]}/refresh`,
         null,
         null,
-        { method: 'POST', headers: this.headers }
+        { 
+          method: 'POST', 
+          headers: this.headers,
+          credentials: 'include'
+        }
       );
 
       if (response.token) {
@@ -112,30 +160,49 @@ export function displayConnectionStatus(services) {
   const container = document.getElementById('serviceConnectionsContainer');
   if (!container) return;
   
-  container.innerHTML = '<h2>Connected Services</h2>';
+  container.innerHTML = `
+    <h2>Connected Services</h2>
+    <div class="services-grid"></div>
+  `;
+  
+  const grid = container.querySelector('.services-grid');
   
   services.forEach(service => {
     const serviceElement = document.createElement('div');
     serviceElement.className = `service-connection ${service.connected ? 'connected' : 'disconnected'}`;
     
-    const icon = document.createElement('span');
-    icon.className = `service-icon ${service.name.toLowerCase()}`;
+    serviceElement.innerHTML = `
+      <div class="service-header">
+        <span class="service-icon ${service.name.toLowerCase()}"></span>
+        <span class="service-name">${service.name}</span>
+      </div>
+      <div class="service-status">
+        <span class="connection-status">${service.connected ? 'Connected' : 'Not Connected'}</span>
+        <button class="action-button ${service.connected ? 'disconnect' : 'connect'}"
+                onclick="handleServiceConnection('${service.name}', ${service.connected})">
+          ${service.connected ? 'Disconnect' : 'Connect'}
+        </button>
+      </div>
+    `;
     
-    const name = document.createElement('span');
-    name.textContent = service.name;
-    
-    const status = document.createElement('span');
-    status.className = 'connection-status';
-    status.textContent = service.connected ? 'Connected' : 'Disconnected';
-    
-    const actionButton = document.createElement('button');
-    actionButton.textContent = service.connected ? 'Disconnect' : 'Connect';
-    actionButton.onclick = () => handleServiceConnection(service.name, service.connected);
-    
-    serviceElement.appendChild(icon);
-    serviceElement.appendChild(name);
-    serviceElement.appendChild(status);
-    serviceElement.appendChild(actionButton);
-    container.appendChild(serviceElement);
+    grid.appendChild(serviceElement);
   });
 }
+
+// Add connection handling to window scope
+window.handleServiceConnection = async (serviceName, isConnected) => {
+  const connectionManager = new ConnectionManager();
+  try {
+    if (isConnected) {
+      await connectionManager.disconnectService(serviceName.toLowerCase());
+      connectionManager.showNotification(`Disconnected from ${serviceName}`, 'success');
+    } else {
+      await connectionManager.initiateOAuthFlow(serviceName.toLowerCase());
+    }
+    // Refresh the connection status display
+    getConnectionStatus();
+  } catch (error) {
+    connectionManager.showNotification(`Failed to ${isConnected ? 'disconnect from' : 'connect to'} ${serviceName}`, 'error');
+    logError(error, { context: 'handleServiceConnection' });
+  }
+};
