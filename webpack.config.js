@@ -5,13 +5,13 @@ const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 module.exports = {
   entry: {
+    main: './src/js/app.js',
     search: './src/js/search/search.js',
-    chat: './src/js/chat/AIchat.js',
     connections: './src/js/services/connectionManager.js'
   },
   output: {
     path: path.resolve(__dirname, 'dist'),
-    filename: 'js/[name].[contenthash].js',
+    filename: 'js/[name].bundle.js',
     clean: true
   },
   module: {
@@ -30,58 +30,59 @@ module.exports = {
         test: /\.css$/,
         use: [
           MiniCssExtractPlugin.loader,
-          'css-loader'
+          {
+            loader: 'css-loader',
+            options: {
+              importLoaders: 1
+            }
+          }
         ]
       }
     ]
+  },
+  resolve: {
+    extensions: ['.js', '.css'],
+    alias: {
+      '@css': path.resolve(__dirname, 'src/css'),
+      '@js': path.resolve(__dirname, 'src/js')
+    }
   },
   plugins: [
     new HtmlWebpackPlugin({
       template: './src/index.html',
       filename: 'index.html',
-      chunks: ['search', 'chat']
+      chunks: ['main', 'search']
     }),
     new HtmlWebpackPlugin({
       template: './src/html/connections.html',
-      filename: 'connections.html',
+      filename: 'html/connections.html',
       chunks: ['connections']
     }),
     new MiniCssExtractPlugin({
-      filename: 'css/[name].[contenthash].css'
+      filename: 'css/[name].css'
     }),
     new CopyWebpackPlugin({
       patterns: [
         { 
-          from: 'src/css',
-          to: 'css' 
+          from: 'src/assets',
+          to: 'assets'
         }
       ]
     })
   ],
-  optimization: {
-    splitChunks: {
-      chunks: 'all',
-      name: 'vendors'
-    }
-  },
   devServer: {
     static: {
-      directory: path.join(__dirname, 'src')
+      directory: path.join(__dirname, 'dist')
     },
+    compress: true,
+    port: 8000,
     hot: true,
     open: true,
-    port: 8000,
-    watchFiles: ['src/**/*.html', 'src/**/*.css']
+    historyApiFallback: true
   },
-  resolve: {
-    extensions: ['.js', '.json'],
-    alias: {
-      '@': path.resolve(__dirname, './src'),
-      '@js': path.resolve(__dirname, './src/js'),
-      '@css': path.resolve(__dirname, './src/css'),
-      '@utils': path.resolve(__dirname, './src/js/utils'),
-      '@services': path.resolve(__dirname, './src/js/services'),
-      '@search': path.resolve(__dirname, './src/js/search')
+  optimization: {
+    splitChunks: {
+      chunks: 'all'
     }
   }
 };

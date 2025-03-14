@@ -1,3 +1,4 @@
+import '@css/styles.css';  // Update CSS import path
 import { fetchResults, saveToLocalStorage, getFromLocalStorage } from '../utils/utils.js';
 // Constants
 const API_BASE_URL = "http://localhost:443/webhook";

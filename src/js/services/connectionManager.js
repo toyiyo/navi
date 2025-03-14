@@ -1,3 +1,4 @@
+import '@css/styles.css';  // Update CSS import path
 import { fetchResults, saveToLocalStorage, getFromLocalStorage, logError } from '../utils/utils.js';
 import config from '../config.js';
 
