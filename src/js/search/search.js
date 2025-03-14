@@ -1,11 +1,9 @@
-import '@css/styles.css';  // Update CSS import path
+import { CONFIG } from '../config.js';
+import '@css/styles.css';
 import { fetchResults, saveToLocalStorage, getFromLocalStorage } from '../utils/utils.js';
-// Constants
-const API_BASE_URL = "http://localhost:443/webhook";
-const HEADERS = { "ngrok-skip-browser-warning": "69420" };
-const MAX_RESULTS = 5;
-const MAX_RECENT_QUERIES = 5;
-const MAX_RECENT_LINKS = 4;
+
+// Constants from CONFIG
+const { API_BASE_URL, HEADERS, MAX_RESULTS, MAX_RECENT_QUERIES, MAX_RECENT_LINKS } = CONFIG;
 
 // Elements
 const searchBox = document.getElementById("searchBox");
@@ -260,14 +258,6 @@ function displayResults(container, headerText, results, logo, linkFn, textFn) {
   });
 }
 
-// Add keyboard navigation
-document.addEventListener("keydown", (e) => {
-  if (e.key === "/" && document.activeElement !== searchBox) {
-    e.preventDefault();
-    searchBox.focus();
-  }
-});
-
 // Add this function to create the connections link
 function createConnectionsLink() {
   const connectionsLink = document.createElement("a");
@@ -292,8 +282,26 @@ function initializeFromLocalStorage() {
   }
 }
 
-// Add this call at the end of your file or in a document ready function
+export function initializeSearch() {
+    createConnectionsLink();
+    initializeFromLocalStorage();
+    
+    // Add keyboard navigation
+    document.addEventListener("keydown", (e) => {
+        if (e.key === "/" && document.activeElement !== searchBox) {
+            e.preventDefault();
+            searchBox.focus();
+        }
+    });
+    
+    // Add event listeners
+    searchBox.addEventListener("keyup", handleSearch);
+    document.addEventListener("click", handleLinkClick);
+}
+
 document.addEventListener("DOMContentLoaded", function() {
   createConnectionsLink();
   initializeFromLocalStorage();
 });
+
+export { handleSearch, handleLinkClick, displayResults };

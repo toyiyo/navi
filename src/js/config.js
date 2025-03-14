@@ -1,3 +1,13 @@
+export const CONFIG = {
+    API_BASE_URL: 'http://localhost:443/webhook',
+    MAX_RESULTS: 5,
+    MAX_RECENT_QUERIES: 5,
+    MAX_RECENT_LINKS: 4,
+    HEADERS: {
+        'ngrok-skip-browser-warning': '69420'
+    }
+};
+
 const config = {
   development: {
     API_BASE_URL: "http://localhost:8080/webhook",
@@ -6,8 +16,8 @@ const config = {
     AUTH_ENDPOINTS: {
       GOOGLE: "auth/google",
       GOOGLE_DOCS: "api/docs",
-      REFRESH: "auth/refresh"
-    }
+      REFRESH: "auth/refresh",
+    },
   },
   production: {
     API_BASE_URL: "https://api.yourproductionurl.com/webhook",
@@ -16,9 +26,9 @@ const config = {
     AUTH_ENDPOINTS: {
       GOOGLE: "auth/google",
       GOOGLE_DOCS: "api/docs",
-      REFRESH: "auth/refresh"
-    }
-  }
+      REFRESH: "auth/refresh",
+    },
+  },
 };
 
-export default config[process.env.NODE_ENV || 'development'];
+export default config[process.env.NODE_ENV || "development"];

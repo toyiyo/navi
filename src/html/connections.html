@@ -1,38 +1,45 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>NAVi - Service Connections</title>
-    <link rel="stylesheet" href="../css/styles.css">
-</head>
-<body>
+    <link rel="stylesheet" href="../css/styles.css" />
+  </head>
+  <body>
     <div class="connections-container">
-        <h1>Service Connections</h1>
-        <div id="serviceConnectionsContainer" class="service-connections-list"></div>
+      <h1>Service Connections</h1>
+      <div
+        id="serviceConnectionsContainer"
+        class="service-connections-list"
+      ></div>
     </div>
     <script type="module">
-        import { ConnectionManager } from '../js/services/connectionManager.js';
-        import { getConnectionStatus } from '../js/services/connectionManager.js';
-        
-        // Initialize connection manager
-        window.connectionManager = new ConnectionManager();
-        
-        // Load initial connection status
-        document.addEventListener('DOMContentLoaded', () => {
-            getConnectionStatus();
-        });
+      import { ConnectionManager } from "../js/services/connectionManager.js";
+      import { getConnectionStatus } from "../js/services/connectionManager.js";
 
-        // Make connection manager available to button click handlers
-        window.handleServiceConnection = async (serviceName, isConnected) => {
-            if (isConnected) {
-                await window.connectionManager.disconnectService(serviceName.toLowerCase());
-            } else {
-                await window.connectionManager.initiateOAuthFlow(serviceName.toLowerCase());
-            }
-            // Refresh connection status
-            getConnectionStatus();
-        };
+      // Initialize connection manager
+      window.connectionManager = new ConnectionManager();
+
+      // Load initial connection status
+      document.addEventListener("DOMContentLoaded", () => {
+        getConnectionStatus();
+      });
+
+      // Make connection manager available to button click handlers
+      window.handleServiceConnection = async (serviceName, isConnected) => {
+        if (isConnected) {
+          await window.connectionManager.disconnectService(
+            serviceName.toLowerCase(),
+          );
+        } else {
+          await window.connectionManager.initiateOAuthFlow(
+            serviceName.toLowerCase(),
+          );
+        }
+        // Refresh connection status
+        getConnectionStatus();
+      };
     </script>
-</body>
+  </body>
 </html>
