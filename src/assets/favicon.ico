@@ -1,0 +1,4 @@
+# Create assets directory if it doesn't exist
+mkdir -p src/assets
+# Copy a default favicon or create one
+touch src/assets/favicon.ico
