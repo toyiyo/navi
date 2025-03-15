@@ -1,5 +1,5 @@
-import { fetchResults }  from '../utils/utils.js';
-import '@css/styles.css';
+import { fetchResults } from '../utils/utils.js';  // Use relative path instead of alias
+import '../css/styles.css';  // Use relative path instead of alias
 
 const openChatPanelButton = document.getElementById("openChatPanel");
 const closeChatPanelButton = document.getElementById("closeChatPanel");

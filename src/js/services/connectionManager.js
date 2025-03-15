@@ -1,4 +1,4 @@
-import '@css/styles.css';  // Update CSS import path
+import '../css/styles.css';  // Use relative path instead of alias
 import { fetchResults, saveToLocalStorage, getFromLocalStorage, logError } from '../utils/utils.js';
 import config from '../config.js';
 

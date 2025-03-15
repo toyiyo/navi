@@ -11,12 +11,10 @@ if (!fs.existsSync(assetsDir)) {
 }
 
 module.exports = {
-    entry: {
-        main: './src/js/app.js'
-    },
+    entry: './src/js/app.js',
     output: {
         path: path.resolve(__dirname, 'dist'),
-        filename: 'js/[name].[contenthash].js',
+        filename: '[name].bundle.js',
         clean: true,
         assetModuleFilename: 'assets/[hash][ext][query]'
     },
@@ -54,17 +52,19 @@ module.exports = {
         extensions: ['.js', '.css'],
         alias: {
             '@css': path.resolve(__dirname, 'src/css'),
-            '@js': path.resolve(__dirname, 'src/js')
+            '@js': path.resolve(__dirname, 'src/js'),
+            '@assets': path.resolve(__dirname, 'src/assets')
         }
     },
     plugins: [
         new HtmlWebpackPlugin({
             template: './src/index.html',
             filename: 'index.html',
-            chunks: ['main']
+            chunks: ['main'],
+            favicon: './src/assets/favicon.ico' // Add favicon
         }),
         new MiniCssExtractPlugin({
-            filename: 'css/[name].[contenthash].css'
+            filename: '[name].css'
         }),
         new CopyWebpackPlugin({
             patterns: [
@@ -78,13 +78,21 @@ module.exports = {
     ],
     devServer: {
         static: {
-            directory: path.join(__dirname, 'dist')
+            directory: path.join(__dirname, 'src'),
+            publicPath: '/',
+            serveIndex: true,
+            watch: true,
         },
         compress: true,
         port: 8000,
         hot: true,
         open: true,
-        historyApiFallback: true
+        historyApiFallback: true,
+        headers: {
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, PATCH, OPTIONS',
+            'Access-Control-Allow-Headers': 'X-Requested-With, content-type, Authorization'
+        }
     },
     optimization: {
         moduleIds: 'deterministic',
