@@ -82,16 +82,79 @@ function createLoadingSpinner() {
   return spinner;
 }
 
+// Cache containers to reduce DOM lookups
+const containers = {
+  wiki: wikiResultsContainer,
+  jira: jiraResultsContainer,
+  asana: asanaResultsContainer,
+  googleDrive: googleDriveResultsContainer,
+};
+
+// Combine fetchResults calls into a single function to reduce redundant logic
 function handleSearch(event) {
   if (event.key === "Enter") {
-    const query = searchBox.value;
-    fetchResults("wiki", query, displayWikiResults);
-    fetchResults("jira", query, displayJiraResults);
-    fetchResults("asana", query, displayAsanaResults);
-    fetchResults("googleDrive", query, displayGoogleDriveResults);
+    const query = searchBox.value.trim();
+    if (!query) return;
+
+    const endpoints = ["wiki", "jira", "asana", "googleDrive"];
+    endpoints.forEach((endpoint) => {
+      fetchResults(endpoint, query, (results) =>
+        displayResults(
+          containers[endpoint],
+          capitalize(endpoint),
+          results,
+          getLogo(endpoint),
+          getLinkFn(endpoint),
+          getTextFn(endpoint)
+        )
+      );
+    });
+
     addRecentQuery(query);
   }
 }
+
+// Helper functions to reduce repetitive code
+function capitalize(text) {
+  return text.charAt(0).toUpperCase() + text.slice(1);
+}
+
+function getLogo(endpoint) {
+  return {
+    googleDrive: googleDriveLogo,
+    asana: asanaLogo,
+    wiki: confluenceLogo,
+    jira: jiraLogo,
+  }[endpoint];
+}
+
+function getLinkFn(endpoint) {
+  return {
+    googleDrive: (result) => result.webViewLink,
+    asana: (result) =>
+      `https://app.asana.com/0/search?q=${encodeURIComponent(
+        result.name
+      )}&searched_type=task&child=${result.gid}&f=true`,
+    wiki: (result) => result.link,
+    jira: (issue) => `https://jira.caremessage.org/browse/${issue.key}`,
+  }[endpoint];
+}
+
+function getTextFn(endpoint) {
+  return {
+    googleDrive: (result) => result.name,
+    asana: (result) => result.name,
+    wiki: (result) => result.title,
+    jira: (issue) => issue.fields.summary,
+  }[endpoint];
+}
+
+// Debounce search input to reduce unnecessary API calls
+let debounceTimeout;
+searchBox.addEventListener("keyup", (event) => {
+  clearTimeout(debounceTimeout);
+  debounceTimeout = setTimeout(() => handleSearch(event), 300);
+});
 
 function handleLinkClick(event) {
   if (
@@ -119,16 +182,14 @@ function addRecentAccessedLink(link) {
   }
 }
 
+// Optimize recent queries and links rendering
+function renderList(container, items, createItemFn) {
+  container.innerHTML = "";
+  items.forEach((item) => container.appendChild(createItemFn(item)));
+}
+
 function displayRecentAccessedLinks(recentLinks) {
-  recentAccessedLinksContainer.innerHTML = "";
-  const header = document.createElement("h2");
-  header.textContent = "Recent Accessed Links";
-  recentAccessedLinksContainer.appendChild(header);
-
-  const row = document.createElement("div");
-  row.className = "row";
-
-  recentLinks.forEach((link) => {
+  renderList(recentAccessedLinksContainer, recentLinks, (link) => {
     const col = document.createElement("div");
     col.className = "col";
 
@@ -142,20 +203,18 @@ function displayRecentAccessedLinks(recentLinks) {
     cardTitle.href = link.href;
     cardTitle.className = "card-title";
     cardTitle.textContent = link.text;
-    cardTitle.target = "_blank"; // Open in new tab
+    cardTitle.target = "_blank";
 
     const iconSpan = document.createElement("span");
     iconSpan.className = "link-icon";
     iconSpan.innerHTML = link.icon;
-    
+
     cardBody.appendChild(iconSpan);
     cardBody.appendChild(cardTitle);
     card.appendChild(cardBody);
     col.appendChild(card);
-    row.appendChild(col);
+    return col;
   });
-
-  recentAccessedLinksContainer.appendChild(row);
 }
 
 function addRecentQuery(query) {
@@ -170,26 +229,15 @@ function addRecentQuery(query) {
 }
 
 function displayRecentQuery(recentQueries) {
-  recentQueryContainer.innerHTML = "";
-  const header = document.createElement("h2");
-  header.textContent = "Recent Queries";
-  recentQueryContainer.appendChild(header);
-
-  recentQueries.forEach((query) => {
+  renderList(recentQueryContainer, recentQueries, (query) => {
     const pill = document.createElement("div");
     pill.className = "pill";
     pill.textContent = query;
     pill.onclick = () => {
       searchBox.value = query;
-      const event = new KeyboardEvent("keyup", {
-        key: "Enter",
-        keyCode: 13,
-        which: 13,
-        bubbles: true,
-      });
-      searchBox.dispatchEvent(event);
+      searchBox.dispatchEvent(new KeyboardEvent("keyup", { key: "Enter" }));
     };
-    recentQueryContainer.appendChild(pill);
+    return pill;
   });
 }
 
